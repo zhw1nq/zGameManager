@@ -144,7 +144,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Soundevent Hash https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Hash.txt")]
         [Comment("Soundevent Names https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Names.txt")]
         [Comment("Or You Can Get Soundevent Hash And Names Make [EnableDebug = 2]")]
-        [Comment("You Can Use Victim Side Only OtherWise Plugin Will Break")]
+        [Comment("You Can Use Victim Side Only Otherwise Plugin Will Break")]
         public List<string> Custom_MuteSounds1_SoundeventHashAndString_Victim_Side { get; set; } = new List<string>
         {
             "3573863551",
@@ -155,7 +155,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Soundevent Hash https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Hash.txt")]
         [Comment("Soundevent Names https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Names.txt")]
         [Comment("Or You Can Get Soundevent Hash And Names Make [EnableDebug = 2]")]
-        [Comment("You Can Use Attacker Side Only OtherWise Plugin Will Break")]
+        [Comment("You Can Use Attacker Side Only Otherwise Plugin Will Break")]
         public List<string> Custom_MuteSounds1_SoundeventHashAndString_Attacker_Side { get; set; } = new List<string>
         {
             "2831007164",
@@ -216,7 +216,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Soundevent Hash https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Hash.txt")]
         [Comment("Soundevent Names https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Names.txt")]
         [Comment("Or You Can Get Soundevent Hash And Names Make [EnableDebug = 2]")]
-        [Comment("You Can Use Victim Side Only OtherWise Plugin Will Break")]
+        [Comment("You Can Use Victim Side Only Otherwise Plugin Will Break")]
         public List<string> Custom_MuteSounds2_SoundeventHashAndString_Victim_Side { get; set; } = new List<string>
         {
             "3124768561",
@@ -227,7 +227,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Soundevent Hash https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Hash.txt")]
         [Comment("Soundevent Names https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Names.txt")]
         [Comment("Or You Can Get Soundevent Hash And Names Make [EnableDebug = 2]")]
-        [Comment("You Can Use Attacker Side Only OtherWise Plugin Will Break")]
+        [Comment("You Can Use Attacker Side Only Otherwise Plugin Will Break")]
         public List<string> Custom_MuteSounds2_SoundeventHashAndString_Attacker_Side { get; set; } = new List<string>
         {
             "708038349",
@@ -295,7 +295,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Soundevent Hash https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Hash.txt")]
         [Comment("Soundevent Names https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Names.txt")]
         [Comment("Or You Can Get Soundevent Hash And Names Make [EnableDebug = 2]")]
-        [Comment("You Can Use Victim Side Only OtherWise Plugin Will Break")]
+        [Comment("You Can Use Victim Side Only Otherwise Plugin Will Break")]
         public List<string> Custom_MuteSounds3_SoundeventHashAndString_Victim_Side { get; set; } = new List<string>
         {
             
@@ -305,7 +305,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Soundevent Hash https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Hash.txt")]
         [Comment("Soundevent Names https://github.com/oqyh/cs2-Game-Manager-GoldKingZ/blob/main/Resources/SoundEvents_Names.txt")]
         [Comment("Or You Can Get Soundevent Hash And Names Make [EnableDebug = 2]")]
-        [Comment("You Can Use Attacker Side Only OtherWise Plugin Will Break")]
+        [Comment("You Can Use Attacker Side Only Otherwise Plugin Will Break")]
         public List<string> Custom_MuteSounds3_SoundeventHashAndString_Attacker_Side { get; set; } = new List<string>
         {
             
@@ -335,6 +335,13 @@ namespace Game_Manager_GoldKingZ.Config
         "2 = Yes, Hide All The Time")]
         public int Custom_MuteSounds3_Hide { get; set; } = 0;
     }
+
+    public class BlockMapSaying_Rule
+    {
+        public string MapName { get; set; } = "ANY";
+        public List<string> Block_Words { get; set; } = new List<string>();
+    }
+
 
     public class MySqlServer
     {
@@ -386,11 +393,6 @@ namespace Game_Manager_GoldKingZ.Config
         public object __InfoSection { get; set; } = null!;
 
         [BreakLine("----------------------------[ ↓ Main Config ↓ ]----------------------------{nextline}")]
-
-        [Comment("Auto Set Player Language Depend Player Country?")]
-        [Comment("true = Yes (Use Lang Depend Player Country Json If Found In Lang Folder, If Not Found Use Default Server core.json ServerLanguage json)")]
-        [Comment("false = No (Use Default Server core.json ServerLanguage json)")]
-        public bool AutoSetPlayerLanguage { get; set; } = false;
 
         [Comment("Reload Game Manager Plugin")]
         public Reload_GameManager Reload_GameManager { get; set; } = new();
@@ -444,6 +446,42 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("false = No")]
         public bool BlockBots { get; set; } = false;
 
+        [Comment("Block When Map Sending Messages")]
+        [Comment("0 = No")]
+        [Comment("1 = Yes, Completely")]
+        [Comment("2 = Yes, But Use [BlockMapSaying_Filter]")]
+        [Range(0, 2, 0,
+        "BlockMapSaying: is invalid, setting to default value (0) Please Choose From 0 To 2.\n" +
+        "0 = No\n" +
+        "1 = Yes, Completely\n" +
+        "2 = Yes, But Use [BlockMapSaying_Filter]")]
+        public int BlockMapSaying { get; set; } = 0;
+
+        [Comment("If [BlockMapSaying = 2], Define Per-Map Block Rules")]
+        [Comment("MapName: The Map This Rule Applies To")]
+        [Comment("  - Exact Match: \"de_dust2\" Applies Only To de_dust2")]
+        [Comment("  - Prefix Match: \"de_\" Applies To All Maps Starting With \"de_\" (de_dust2, de_mirage, etc.)")]
+        [Comment("  - \"ANY\" Applies As A Fallback When No Exact Or Prefix Match Is Found")]
+        [Comment("Block_Words: Block Messages That Contain Any Of These Words")]
+        public List<BlockMapSaying_Rule> BlockMapSaying_Filter { get; set; } = new List<BlockMapSaying_Rule>
+        {
+            new BlockMapSaying_Rule
+            {
+                MapName = "ANY",
+                Block_Words = new List<string> { "Created", "Made", "Creator"}
+            },
+            new BlockMapSaying_Rule
+            {
+                MapName = "de_",
+                Block_Words = new List<string> { "MadeBy", "Warning" }
+            },
+            new BlockMapSaying_Rule
+            {
+                MapName = "ze_umbrellazombie_v1_p3_final",
+                Block_Words = new List<string> { "Made", "Creator" }
+            }
+        };
+
         [Comment("Block Players Animated Name Changer?")]
         [Comment("0 = No")]
         [Comment("1 = Yes, Send Him To Spec With Message Warning To Stop And Block From Joining Team Until Stop Changing Name")]
@@ -461,7 +499,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("If [BlockNameChanger = 1 or 2], How Many (In Secs) Block Him From Joining")]
         public int BlockNameChanger_Block { get; set; } = 10;
 
-        [Comment("If [BlockNameChanger = 2], Send Server Cosnole Command After Timer [BlockNameChanger_Block] Finish")]
+        [Comment("If [BlockNameChanger = 2], Send Server Console Command After Timer [BlockNameChanger_Block] Finish")]
         [Comment("==========================")]
         [Comment("        Placeholders")]
         [Comment("==========================")]
@@ -473,7 +511,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("{PLAYER_STEAMID3} = Player SteamID ([U:1:245821265])")]
         [Comment("{PLAYER_STEAMID32} = Player SteamID (245821265)")]
         [Comment("{PLAYER_STEAMID64} = Player SteamID (76561198206086993)")]
-        public string BlockNameChanger_SendServerConsoleCommand { get; set; } = "kick {PLAYER_NAME}";
+        public string BlockNameChanger_SendServerConsoleCommand { get; set; } = "kickid {PLAYER_ID}";
 
         [Comment("Block Ingame Commands")]
         public Block_Commands Block_Commands { get; set; } = new();
@@ -496,10 +534,15 @@ namespace Game_Manager_GoldKingZ.Config
         "2 = Yes, Hide Players Killfeed And Show Who I Killed Only")]
         public int HideKillfeed { get; set; } = 0;
 
-        [Comment("Hide Blood And HeadShot Spark Decals/Effects?")]
+        [Comment("Hide HeadShot Spark Effects?")]
         [Comment("true = Yes")]
         [Comment("false = No")]
-        public bool HideBloodAndHsSpark { get; set; } = false;
+        public bool HideHeadShotSpark { get; set; } = false;
+
+        [Comment("Hide Blood Decals?")]
+        [Comment("true = Yes")]
+        [Comment("false = No")]
+        public bool HideBloodDecals { get; set; } = false;
 
         [Comment("Hide TeamMate Head Tag Names?")]
         [Comment("0 = No")]
@@ -606,6 +649,17 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("false = No")]
         public bool DisableCameraSpectator { get; set; } = false;
 
+        [Comment("If [sv_infinite_ammo is not 2], Disable New Reload Clips Behavior?")]
+        [Comment("0 = No")]
+        [Comment("1 = Yes")]
+        [Comment("2 = Yes, But Use Custom Ammo/Clip (config/weapons_config.json)")]
+        [Range(0, 2, 0,
+        "DisableNewReloadClips: is invalid, setting to default value (0) Please Choose From 0 To 2.\n" +
+        "0 = No\n" +
+        "1 = Yes\n" +
+        "2 = Yes, But Use Custom Ammo/Clip (config/weapons_config.json)")]
+        public int DisableNewReloadClips { get; set; } = 0;
+
         [Comment("Disable Players Screen Shake")]
         public Disable_AimPunch Disable_AimPunch { get; set; } = new();
 
@@ -707,7 +761,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Ignore Bomb Planted HUD Messages And Sound?")]
         [Comment("true = Yes")]
         [Comment("false = No")]
-        public bool Ignore_BombPlantedHUDMessages { get; set; } = false;
+        public bool Ignore_BombPlantedHUDMessagesAndSound { get; set; } = false;
 
         [Comment("Ignore TeamMate Attack Messages?")]
         [Comment("true = Yes")]
@@ -858,7 +912,7 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("If [AutoClean_Enable = true] Defines How Often (In Secs) The Plugin Checks For Ground Weapons")]
         [Comment("Choose From 1 To 999")]
         [Range(1, 999, 5,
-        "AutoClean_MaxWeaponsOnGround: is invalid, setting to default value (5) Please Choose From 1 To 999.")]
+        "AutoClean_Timer: is invalid, setting to default value (5) Please Choose From 1 To 999.")]
         public int AutoClean_Timer { get; set; } = 5;
 
         [Comment("If [AutoClean_Timer] Pass Whats Max Weapons On Ground")]
@@ -901,13 +955,13 @@ namespace Game_Manager_GoldKingZ.Config
         [Comment("Whitelist These IPs (No Need For Ports)")]
         [Comment("Any Ip Not In The List Will Be Blocked")]
         [Comment("Example:")]
-        [Comment("\"12.34.56.789\"")]
+        [Comment("\"12.34.56.78\"")]
         [Comment("\"14.21.61.121\"")]
         [Comment("Empty = Disable This Feature")]
         public List<string> Filter_Whitelist_Ips { get; set; } = new List<string>
         {
             "1.1.1.1",
-            "12.34.56.789",
+            "12.34.56.78",
             "14.21.61.121"
         };
 
@@ -966,7 +1020,7 @@ namespace Game_Manager_GoldKingZ.Config
 
         [Comment("If [Cookies_Enable = 1 or 2], Auto Delete Inactive Players More Than X (Days) Old")]
         [Comment("0 = Dont Auto Delete")]
-        public int Cookies_AutoRemovePlayerOlderThanXDays { get; set; } = 7;
+        public int Cookies_AutoRemoveInactivePlayersOlderThanDays { get; set; } = 7;
 
         [BreakLine("----------------------------[ ↓ MySql Config ↓ ]----------------------------{nextline}")]
         
@@ -998,15 +1052,20 @@ namespace Game_Manager_GoldKingZ.Config
 
         [Comment("Auto Delete Inactive Players More Than X (Days) Old")]
         [Comment("0 = Dont Auto Delete")]
-        public int MySql_AutoRemovePlayerOlderThanXDays { get; set; } = 7;
+        public int MySql_AutoRemoveInactivePlayersOlderThanDays { get; set; } = 7;
 
-        [BreakLine("----------------------------[ ↓ Utilities  ↓ ]----------------------------{nextline}")]
-
-        [Comment("Auto Update GeoLocation (In ../shared/GoldKingZ/GeoLocation/)?")]
+        [BreakLine("----------------------------[ ↓ Utilities ↓ ]----------------------------{nextline}")]
+        
+        [Comment("Auto Update Signatures (In ../plugins/Game-Manager-GoldKingZ/gamedata/gamedata.json)?")]
         [Comment("true = Yes")]
         [Comment("false = No")]
-        public bool AutoUpdateGeoLocation { get; set; } = false;
-        
+        public bool AutoUpdateSignatures { get; set; } = true;
+
+        [Comment("Use OnConVarChanged Hook On Any ConVar Change Made By Game Manager")]
+        [Comment("true = Yes")]
+        [Comment("false = No")]
+        public bool UseOnConVarChangedHook { get; set; } = true;
+
         [Comment("Enable Debug Plugin In Server Console?")]
         [Comment("0 = No")]
         [Comment("1 = Yes, Debug Everything")]
@@ -1043,6 +1102,7 @@ namespace Game_Manager_GoldKingZ.Config
             }
 
             filePath = Path.Combine(configDirectory, "config.json");
+            JsonCreator.StartCreate();
 
             if (!File.Exists(filePath)) { Save(); return; }
 

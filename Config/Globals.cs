@@ -5,16 +5,6 @@ namespace Game_Manager_GoldKingZ;
 
 public class Globals_Static
 {
-    public class PersonData
-    {
-        public ulong PlayerSteamID { get; set; }
-        public int Toggle_AimPunch { get; set; }
-        public int Toggle_Custom_MuteSounds1 { get; set; }
-        public int Toggle_Custom_MuteSounds2 { get; set; }
-        public int Toggle_Custom_MuteSounds3 { get; set; }
-        public DateTime DateAndTime { get; set; }
-    }
-
     public static readonly Dictionary<string, (string State, string ChatType)> messageMappings = new()
     {
         { "Cstrike_Chat_All", ("ALIVE", "ALL") },
@@ -31,14 +21,19 @@ public class Globals_Static
     public const uint HIDEWEAPONS = 64;
     public const uint HIDECHAT = 128;
     public const uint CROSSHAIRANDNAMETAGS = 256;
+    public const int EFFECT_BLOOD_SPURT_AND_IMPACT_FLESH = 4;
+    public const int EFFECT_HEADSHOT_SPARK = 7;
 }
 
 public class Globals
 {
+    private long _reloadIdCounter = 0;
+    public long GetNextReloadId() => ++_reloadIdCounter;
     public string AntiCrash_StartWith = "";
     public string AntiCrash_Contains = "";
     public string AntiCrash_BlockRadio = "";
     public bool OnTakeDamage_Hooked = false;
+    public bool Downloading_FromGithub = false;
     public class PlayerDataClass
     {
         public CCSPlayerController Player { get; set; }
@@ -49,17 +44,14 @@ public class Globals
         public bool PlayerName_Block { get; set; }
         public bool PlayerName_Block_Message { get; set; }
         public ulong SteamId { get; set; }
-        public int Toggle_AimPunch { get; set; }
-        public int Toggle_Custom_MuteSounds1 { get; set; }
-        public int Toggle_Custom_MuteSounds2 { get; set; }
-        public int Toggle_Custom_MuteSounds3 { get; set; }
         public string MessageType { get; set; }
         public int PlayerAlpha { get; set; }
         public bool StabedHisTeamMate { get; set; }
         public CounterStrikeSharp.API.Modules.Timers.Timer Timer_DeadBody { get; set; }
         public DateTime EventPlayerChat { get; set; }
+        public DateTime EventPlayerChat_Filter { get; set; }
         public DateTime LastNameChangeTime { get; set; }
-        public PlayerDataClass(CCSPlayerController player, CCSPlayerController Attackerr, CCSPlayerController Victimm, string PlayerNamee, int PlayerName_Countt, bool PlayerName_Blockk, bool PlayerName_Block_Messagee, ulong steamId, int Toggle_AimPunchh, int Toggle_Custom_MuteSounds11, int Toggle_Custom_MuteSounds22, int Toggle_Custom_MuteSounds33, string MessageTypee, int playerAlpha, bool StabedHisTeamMatee, CounterStrikeSharp.API.Modules.Timers.Timer timer_DeadBody, DateTime EventPlayerChatt, DateTime LastNameChangeTimee)
+        public PlayerDataClass(CCSPlayerController player, CCSPlayerController Attackerr, CCSPlayerController Victimm, string PlayerNamee, int PlayerName_Countt, bool PlayerName_Blockk, bool PlayerName_Block_Messagee, ulong steamId, string MessageTypee, int playerAlpha, bool StabedHisTeamMatee, CounterStrikeSharp.API.Modules.Timers.Timer timer_DeadBody, DateTime EventPlayerChatt, DateTime EventPlayerChat_Filterr, DateTime LastNameChangeTimee)
         {
             Player = player;
             Attacker = Attackerr;
@@ -69,35 +61,35 @@ public class Globals
             PlayerName_Block = PlayerName_Blockk;
             PlayerName_Block_Message = PlayerName_Block_Messagee;
             SteamId = steamId;
-            Toggle_AimPunch = Toggle_AimPunchh;
-            Toggle_Custom_MuteSounds1 = Toggle_Custom_MuteSounds11;
-            Toggle_Custom_MuteSounds2 = Toggle_Custom_MuteSounds22;
-            Toggle_Custom_MuteSounds3 = Toggle_Custom_MuteSounds33;
             PlayerAlpha = playerAlpha;
             StabedHisTeamMate = StabedHisTeamMatee;
             MessageType = MessageTypee;
             Timer_DeadBody = timer_DeadBody;
             EventPlayerChat = EventPlayerChatt;
+            EventPlayerChat_Filter = EventPlayerChat_Filterr;
             LastNameChangeTime = LastNameChangeTimee;
         }
     }
     public Dictionary<int, PlayerDataClass> Player_Data = new Dictionary<int, PlayerDataClass>();
+    public Dictionary<string, string> HookConVars = new();
+    public Dictionary<int, long> ActiveReloadId = new();
     public List<CBaseEntity> CbaseWeapons = new List<CBaseEntity>();
     public JObject? JsonData { get; set; }
+    public JObject? JsonData_Weapon { get; set; }
     public CounterStrikeSharp.API.Modules.Timers.Timer? TimerCleanUp;
     public CounterStrikeSharp.API.Modules.Timers.Timer? TimerChecker;
 
-    public void Clear(bool force = false)
+
+    public void Clear()
     {
+        _reloadIdCounter = 0;
+        Player_Data?.Clear();
+        ActiveReloadId?.Clear();
         CbaseWeapons?.Clear();
+
         TimerCleanUp?.Kill();
         TimerCleanUp = null;
         TimerChecker?.Kill();
         TimerChecker = null;
-
-        if(force)
-        {
-            Player_Data?.Clear();
-        }
     }
 }

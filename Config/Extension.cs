@@ -17,7 +17,6 @@ using CounterStrikeSharp.API.Modules.Cvars;
 namespace Game_Manager_GoldKingZ;
 public static class Extension
 {
-
     public static bool IsValid([NotNullWhen(true)] this CCSPlayerController? player, bool IncludeBots = false, bool IncludeHLTV = false)
     {
         if (player == null || !player.IsValid)
@@ -50,22 +49,34 @@ public static class Extension
 
     public static int ToggleOnOff(this int value)
     {
-        return value switch
-        {
-            1 => -2,
-            2 => -1,
-            -1 => -2,
-            -2 => -1,
-            _ => value
-        };
+        return value == 1 ? 2 : 1;
     }
 
     public static int ToDebugConfig(this int enableDebug, int mode)
     {
+        if (mode == 1) return 1;
+
         if (enableDebug == 1) return 1;
+
         return enableDebug == mode ? mode : -1;
     }
 
+    public static string? GetBestMapMatch(this string currentMap, IEnumerable<string> availableKeys)
+    {
+        if (string.IsNullOrEmpty(currentMap) || availableKeys == null) return null;
+
+        if (availableKeys.Contains(currentMap, StringComparer.OrdinalIgnoreCase))
+            return availableKeys.First(k => k.Equals(currentMap, StringComparison.OrdinalIgnoreCase));
+
+        var prefixMatch = availableKeys
+            .Where(key => key.EndsWith("_") && currentMap.StartsWith(key, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(key => key.Length)
+            .FirstOrDefault();
+        if (prefixMatch != null) return prefixMatch;
+
+        var anyKey = availableKeys.FirstOrDefault(k => k.Equals("ANY", StringComparison.OrdinalIgnoreCase));
+        return anyKey;
+    }
     public static bool HasValidPermissionData(this string? groups)
     {
         if (string.IsNullOrWhiteSpace(groups)) return false;
@@ -230,6 +241,22 @@ public static class Extension
         newEvent.FireEventToClient(player);
     }
 
+    public static void SetBodygroup(this CCSPlayerController? player, string group, int value)
+    {
+        if (player == null || !player.IsValid) return;
+
+        var PlayerPawn = player.PlayerPawn;
+        if (PlayerPawn == null || !PlayerPawn.IsValid) return;
+
+        var PlayerPawnValue = player.PlayerPawn.Value;
+        if (PlayerPawnValue == null || !PlayerPawnValue.IsValid) return;
+        
+        PlayerPawnValue.AcceptInput("SetBodyGroup",
+        PlayerPawnValue,
+        PlayerPawnValue,
+        $"{group},{value}");
+    }
+
     public static string ToCustomGrenadeName(this string grenadeName, CCSPlayerController? player,
     (string? Nade_Decoy, string? Nade_Flashbang, string? Nade_Incgrenade, string? Nade_Molotov,
     string? Nade_Smokegrenade, string? Nade_Hegrenade, string? JoinTeam_SPEC, string? JoinTeam_CT,
@@ -298,7 +325,7 @@ public static class Extension
         if (string.IsNullOrEmpty(input)) return input;
 
         string pattern = @"\{([^}]+)\}";
-        return System.Text.RegularExpressions.Regex.Replace(input, pattern, match =>
+        return Regex.Replace(input, pattern, match =>
         {
             string colorName = match.Groups[1].Value;
             return _colorNames.Contains(colorName) ? "" : match.Value;

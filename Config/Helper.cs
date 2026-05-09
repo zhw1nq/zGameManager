@@ -15,8 +15,6 @@ using CounterStrikeSharp.API.Modules.Memory;
 using System.Drawing;
 using System.Security.Cryptography;
 using System.Globalization;
-using MaxMind.GeoIP2;
-using MaxMind.GeoIP2.Exceptions;
 
 
 namespace Game_Manager_GoldKingZ;
@@ -300,11 +298,11 @@ public class Helper
         }
     }
 
-    public static void ClearVariables(bool force = false)
+    public static void ClearVariables()
     {
         var g_Main = MainPlugin.Instance.g_Main;
 
-        g_Main.Clear(force);
+        g_Main.Clear();
     }
 
     public static CCSGameRules? GetGameRules()
@@ -324,7 +322,7 @@ public class Helper
         return GetGameRules()?.WarmupPeriod ?? false;
     }
 
-    public static void RegisterCommandsAndHooks(bool Late_Hook = false)
+    public static void RegisterCommandsAndHooks()
     {
         Server.ExecuteCommand("sv_hibernate_when_empty false");
 
@@ -347,6 +345,11 @@ public class Helper
         MainPlugin.Instance.AddCommandListener("say", MainPlugin.Instance.OnPlayerSay, HookMode.Post);
         MainPlugin.Instance.AddCommandListener("say_team", MainPlugin.Instance.OnPlayerSay_Team, HookMode.Post);
         MainPlugin.Instance.HookUserMessage(118, MainPlugin.Instance.OnUserMessage_OnSayText2, HookMode.Pre);
+        
+        if(Configs.Instance.BlockMapSaying > 0)
+        {
+            MainPlugin.Instance.HookUserMessage(117, MainPlugin.Instance.OnUserMessage_OnSayText, HookMode.Pre);
+        }
 
         RegisterCssCommands(Configs.Instance.Reload_GameManager.Reload_GameManager_CommandsInGame.ConvertCommands(), "Commands To Reload Game Manager Plugin", MainPlugin.Instance.Game_UserMessages.CommandsAction_ReloadPlugin);
 
@@ -368,9 +371,17 @@ public class Helper
             RegisterCssListener(commands.ToArray(), MainPlugin.Instance.Game_Listeners.BlockCommands_Listener);
         }
         
-        if(Configs.Instance.DisableChickenFromSpawn)
+        if(Configs.Instance.DisableChickenFromSpawn || Configs.Instance.DisableNewReloadClips > 0)
         {
             MainPlugin.Instance.RegisterListener<Listeners.OnEntitySpawned>(MainPlugin.Instance.OnEntitySpawned);
+        }
+
+        if (Configs.Instance.DisableNewReloadClips == 2)
+        {
+            MainPlugin.Instance.RegisterListener<Listeners.OnEntityDeleted>(MainPlugin.Instance.OnEntityDeleted);
+            MainPlugin.Instance.RegisterEventHandler<EventWeaponFire>(MainPlugin.Instance.OnEventWeaponFire);
+            MainPlugin.Instance.RegisterEventHandler<EventWeaponReload>(MainPlugin.Instance.OnEventWeaponReload);
+            MainPlugin.Instance.RegisterEventHandler<EventItemEquip>(MainPlugin.Instance.OnEventItemEquip);
         }
 
         if (Configs.Instance.BlockNameChanger > 0)
@@ -386,22 +397,22 @@ public class Helper
 
         if (Configs.Instance.Disable_AimPunch.DisableAimPunch > 1)
         {
-            RegisterCssCommands(Configs.Instance.Disable_AimPunch.DisableAimPunch_CommandsInGame.ConvertCommands(), "Commands To Toggle AimPunch Shake", MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_AimPunch);
+            RegisterCssCommands(Configs.Instance.Disable_AimPunch.DisableAimPunch_CommandsInGame.ConvertCommands(), "Commands To Toggle AimPunch Shake", MainPlugin.Instance.Game_UserMessages.CommandsAction_AimPunch);
         }
 
         if (Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1 > 1)
         {
-            RegisterCssCommands(Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1_CommandsInGame.ConvertCommands(), "Commands To Toggle Mute Mute Sounds 1", MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_MuteSounds_1);
+            RegisterCssCommands(Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1_CommandsInGame.ConvertCommands(), "Commands To Toggle Mute Mute Sounds 1", MainPlugin.Instance.Game_UserMessages.CommandsAction_Custom_MuteSounds1);
         }
 
         if (Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2 > 1)
         {
-            RegisterCssCommands(Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2_CommandsInGame.ConvertCommands(), "Commands To Toggle Mute Mute Sounds 2", MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_MuteSounds_2);
+            RegisterCssCommands(Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2_CommandsInGame.ConvertCommands(), "Commands To Toggle Mute Mute Sounds 2", MainPlugin.Instance.Game_UserMessages.CommandsAction_Custom_MuteSounds2);
         }
 
         if (Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3 > 1)
         {
-            RegisterCssCommands(Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3_CommandsInGame.ConvertCommands(), "Commands To Toggle Mute Mute Sounds 3", MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_MuteSounds_3);
+            RegisterCssCommands(Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3_CommandsInGame.ConvertCommands(), "Commands To Toggle Mute Mute Sounds 3", MainPlugin.Instance.Game_UserMessages.CommandsAction_Custom_MuteSounds3);
         }
 
         if (Configs.Instance.BlockRadio)
@@ -423,10 +434,14 @@ public class Helper
             MainPlugin.Instance.AddCommandListener("player_ping", MainPlugin.Instance.Game_Listeners.BlockPing_Listener, HookMode.Pre);
         }
 
-        if (Configs.Instance.HideBloodAndHsSpark)
+        if (Configs.Instance.HideBloodDecals)
         {
-            MainPlugin.Instance.HookUserMessage(400, MainPlugin.Instance.Game_UserMessages.HideBloodAndHsSpark_UserMessages, HookMode.Pre);
-            MainPlugin.Instance.HookUserMessage(411, MainPlugin.Instance.Game_UserMessages.HideBloodAndHsSpark_UserMessages, HookMode.Pre);
+            MainPlugin.Instance.HookUserMessage(201, MainPlugin.Instance.Game_UserMessages.HideBloodDecals_UserMessages, HookMode.Pre);
+        }
+
+        if (Configs.Instance.HideBloodDecals || Configs.Instance.HideHeadShotSpark)
+        {
+            MainPlugin.Instance.HookUserMessage(400, MainPlugin.Instance.Game_UserMessages.HideBloodDecalsAndHideHeadShotSpark_UserMessages, HookMode.Pre);
         }
 
         if (Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1 > 0 || Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2 > 0 || Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3 > 0
@@ -447,28 +462,30 @@ public class Helper
             MainPlugin.Instance.HookUserMessage(124, MainPlugin.Instance.Game_UserMessages.Ignore_TextMsg_UserMessages, HookMode.Pre);
         }
 
-        if (Configs.Instance.Ignore_TeamMateAttackMessages || Configs.Instance.EnableDebug.ToDebugConfig(4) is 4 or 1)
-        {
-            MainPlugin.Instance.HookUserMessage(323, MainPlugin.Instance.Game_UserMessages.Ignore_HintText_UserMessages, HookMode.Pre);
-        }
-
         if (Configs.Instance.Ignore_PlantingBombMessages || Configs.Instance.Ignore_DefusingBombMessages || Configs.Instance.EnableDebug.ToDebugConfig(4) is 4 or 1)
         {
             MainPlugin.Instance.HookUserMessage(322, MainPlugin.Instance.Game_UserMessages.Ignore_RadioText_UserMessages, HookMode.Pre);
         }
 
-        if (Late_Hook) return;
+        if (Configs.Instance.Ignore_TeamMateAttackMessages || Configs.Instance.EnableDebug.ToDebugConfig(4) is 4 or 1)
+        {
+            MainPlugin.Instance.HookUserMessage(323, MainPlugin.Instance.Game_UserMessages.Ignore_HintText_UserMessages, HookMode.Pre);
+        }
+    }
 
+    public static void RegisterHookOnEntityTakeDamagePre()
+    {
         if (!MainPlugin.Instance.g_Main.OnTakeDamage_Hooked)
         {
             if (Configs.Instance.Disable_AimPunch.DisableAimPunch > 0 || Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1 > 1 || Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2 > 1 || Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3 > 1
             || Configs.Instance.Sounds_MuteKnife == 2 || Configs.Instance.DisableKnifeDamage || Configs.Instance.DisableZeusDamage || Configs.Instance.EnableDebug.ToDebugConfig(2) == 2)
             {
-                MainPlugin.Instance.RegisterListener<Listeners.OnEntityTakeDamagePre>(MainPlugin.Instance.Game_Listeners.OnEntityTakeDamagePre);
+                MainPlugin.Instance.RegisterListener<Listeners.OnEntityTakeDamagePre>(MainPlugin.Instance.OnEntityTakeDamagePre);
                 MainPlugin.Instance.g_Main.OnTakeDamage_Hooked = true;
             }
         }
     }
+
 
     public static void RemoveRegisterCommandsAndHooks()
     {
@@ -476,13 +493,14 @@ public class Helper
         MainPlugin.Instance.RemoveListener<Listeners.OnMapStart>(MainPlugin.Instance.OnMapStart);
         MainPlugin.Instance.RemoveListener<Listeners.OnTick>(MainPlugin.Instance.OnTick);
         MainPlugin.Instance.RemoveListener<Listeners.OnMapEnd>(MainPlugin.Instance.OnMapEnd);
-        MainPlugin.Instance.RemoveListener<Listeners.OnEntitySpawned>(MainPlugin.Instance.OnEntitySpawned);
         MainPlugin.Instance.RemoveListener<Listeners.OnEntityCreated>(MainPlugin.Instance.OnEntityCreated);
+        MainPlugin.Instance.RemoveListener<Listeners.OnEntitySpawned>(MainPlugin.Instance.OnEntitySpawned);
+        MainPlugin.Instance.RemoveListener<Listeners.OnEntityDeleted>(MainPlugin.Instance.OnEntityDeleted);
         RemoveCssCommands(Configs.Instance.Reload_GameManager.Reload_GameManager_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_ReloadPlugin);
-        RemoveCssCommands(Configs.Instance.Disable_AimPunch.DisableAimPunch_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_AimPunch);
-        RemoveCssCommands(Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_MuteSounds_1);
-        RemoveCssCommands(Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_MuteSounds_2);
-        RemoveCssCommands(Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_Toggle_MuteSounds_3);
+        RemoveCssCommands(Configs.Instance.Disable_AimPunch.DisableAimPunch_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_AimPunch);
+        RemoveCssCommands(Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_Custom_MuteSounds1);
+        RemoveCssCommands(Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_Custom_MuteSounds2);
+        RemoveCssCommands(Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3_CommandsInGame.ConvertCommands(), MainPlugin.Instance.Game_UserMessages.CommandsAction_Custom_MuteSounds3);
 
         var commands_RadioArray = RadioArray.ToList();
         commands_RadioArray.Add(MainPlugin.Instance.g_Main.AntiCrash_BlockRadio);
@@ -507,15 +525,19 @@ public class Helper
         MainPlugin.Instance.DeregisterEventHandler<EventPlayerTeam>(MainPlugin.Instance.OnEventPlayerTeam, HookMode.Pre);
         MainPlugin.Instance.DeregisterEventHandler<EventGrenadeThrown>(MainPlugin.Instance.OnEventGrenadeThrown);
         MainPlugin.Instance.DeregisterEventHandler<EventBotTakeover>(MainPlugin.Instance.OnEventBotTakeover);
+        MainPlugin.Instance.DeregisterEventHandler<EventWeaponFire>(MainPlugin.Instance.OnEventWeaponFire);
+        MainPlugin.Instance.DeregisterEventHandler<EventWeaponReload>(MainPlugin.Instance.OnEventWeaponReload);
+        MainPlugin.Instance.DeregisterEventHandler<EventItemEquip>(MainPlugin.Instance.OnEventItemEquip);
 
         MainPlugin.Instance.RemoveCommandListener("say", MainPlugin.Instance.OnPlayerSay, HookMode.Post);
         MainPlugin.Instance.RemoveCommandListener("say_team", MainPlugin.Instance.OnPlayerSay_Team, HookMode.Post);
         MainPlugin.Instance.RemoveCommandListener("jointeam", MainPlugin.Instance.OnJoinTeam, HookMode.Pre);
         MainPlugin.Instance.RemoveCommandListener("playerchatwheel", MainPlugin.Instance.Game_Listeners.BlockChatwheel_Listener, HookMode.Pre);
         MainPlugin.Instance.RemoveCommandListener("player_ping", MainPlugin.Instance.Game_Listeners.BlockPing_Listener, HookMode.Pre);
+        MainPlugin.Instance.UnhookUserMessage(117, MainPlugin.Instance.OnUserMessage_OnSayText, HookMode.Pre);
         MainPlugin.Instance.UnhookUserMessage(118, MainPlugin.Instance.OnUserMessage_OnSayText2, HookMode.Pre);
-        MainPlugin.Instance.UnhookUserMessage(400, MainPlugin.Instance.Game_UserMessages.HideBloodAndHsSpark_UserMessages, HookMode.Pre);
-        MainPlugin.Instance.UnhookUserMessage(411, MainPlugin.Instance.Game_UserMessages.HideBloodAndHsSpark_UserMessages, HookMode.Pre);
+        MainPlugin.Instance.UnhookUserMessage(400, MainPlugin.Instance.Game_UserMessages.HideBloodDecalsAndHideHeadShotSpark_UserMessages, HookMode.Pre);
+        MainPlugin.Instance.UnhookUserMessage(201, MainPlugin.Instance.Game_UserMessages.HideBloodDecals_UserMessages, HookMode.Pre);
         MainPlugin.Instance.UnhookUserMessage(208, MainPlugin.Instance.Game_UserMessages.MuteSounds_UserMessages, HookMode.Pre);
         MainPlugin.Instance.UnhookUserMessage(369, MainPlugin.Instance.Game_UserMessages.MuteSounds_WeaponSound, HookMode.Pre);
         MainPlugin.Instance.UnhookUserMessage(452, MainPlugin.Instance.Game_UserMessages.MuteGunShots_UserMessages, HookMode.Pre);
@@ -523,41 +545,16 @@ public class Helper
         MainPlugin.Instance.UnhookUserMessage(322, MainPlugin.Instance.Game_UserMessages.Ignore_RadioText_UserMessages, HookMode.Pre);
         MainPlugin.Instance.UnhookUserMessage(323, MainPlugin.Instance.Game_UserMessages.Ignore_HintText_UserMessages, HookMode.Pre);
 
-        if (MainPlugin.Instance.g_Main.OnTakeDamage_Hooked)
-        {
-            MainPlugin.Instance.RemoveListener<Listeners.OnEntityTakeDamagePre>(MainPlugin.Instance.Game_Listeners.OnEntityTakeDamagePre);
-            MainPlugin.Instance.g_Main.OnTakeDamage_Hooked = false;
-        }
+        CustomGameData.Unload(); 
     }
 
-    public static List<CCSPlayerController> GetPlayersController(bool IncludeBots = false, bool IncludeHLTV = false, bool IncludeNone = true, bool IncludeSPEC = true, bool IncludeCT = true, bool IncludeT = true)
+    public static void RemoveOnEntityTakeDamagePre()
     {
-        return Utilities
-            .FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller")
-            .Where(p =>
-                p != null &&
-                p.IsValid &&
-                p.Connected == PlayerConnectedState.PlayerConnected &&
-                (IncludeBots || !p.IsBot) &&
-                (IncludeHLTV || !p.IsHLTV) &&
-                ((IncludeCT && p.TeamNum == (byte)CsTeam.CounterTerrorist) ||
-                (IncludeT && p.TeamNum == (byte)CsTeam.Terrorist) ||
-                (IncludeNone && p.TeamNum == (byte)CsTeam.None) ||
-                (IncludeSPEC && p.TeamNum == (byte)CsTeam.Spectator)))
-            .ToList();
-    }
-    public static int GetPlayersCount(bool IncludeBots = false, bool IncludeHLTV = false, bool IncludeSPEC = true, bool IncludeCT = true, bool IncludeT = true)
-    {
-        return Utilities.GetPlayers().Count(p =>
-            p != null &&
-            p.IsValid &&
-            p.Connected == PlayerConnectedState.PlayerConnected &&
-            (IncludeBots || !p.IsBot) &&
-            (IncludeHLTV || !p.IsHLTV) &&
-            ((IncludeCT && p.TeamNum == (byte)CsTeam.CounterTerrorist) ||
-            (IncludeT && p.TeamNum == (byte)CsTeam.Terrorist) ||
-            (IncludeSPEC && p.TeamNum == (byte)CsTeam.Spectator))
-        );
+        if (MainPlugin.Instance.g_Main.OnTakeDamage_Hooked)
+        {
+            MainPlugin.Instance.RemoveListener<Listeners.OnEntityTakeDamagePre>(MainPlugin.Instance.OnEntityTakeDamagePre);
+            MainPlugin.Instance.g_Main.OnTakeDamage_Hooked = false;
+        }
     }
 
     public static bool IsPlayerInGroupPermission(CCSPlayerController player, string groups)
@@ -612,7 +609,7 @@ public class Helper
     private static bool Permission_CheckFlags(CCSPlayerController player, string flags)
     {
         if (player == null || !player.IsValid ||
-            player.Connected != PlayerConnectedState.PlayerConnected ||
+            player.Connected != PlayerConnectedState.Connected ||
             player.IsBot || player.IsHLTV)
             return false;
 
@@ -642,7 +639,7 @@ public class Helper
     private static bool Permission_CheckGroups(CCSPlayerController player, string groups)
     {
         if (player == null || !player.IsValid ||
-            player.Connected != PlayerConnectedState.PlayerConnected ||
+            player.Connected != PlayerConnectedState.Connected ||
             player.IsBot || player.IsHLTV)
             return false;
 
@@ -659,6 +656,36 @@ public class Helper
             .Any(reqGroup => playerData.Groups.Contains(reqGroup, StringComparer.OrdinalIgnoreCase));
     }
 
+    public static List<CCSPlayerController> GetPlayersController(bool IncludeBots = false, bool IncludeHLTV = false, bool IncludeNone = true, bool IncludeSPEC = true, bool IncludeCT = true, bool IncludeT = true)
+    {
+        return Utilities
+            .FindAllEntitiesByDesignerName<CCSPlayerController>("cs_player_controller")
+            .Where(p =>
+                p != null &&
+                p.IsValid &&
+                p.Connected == PlayerConnectedState.Connected &&
+                (IncludeBots || !p.IsBot) &&
+                (IncludeHLTV || !p.IsHLTV) &&
+                ((IncludeCT && p.TeamNum == (byte)CsTeam.CounterTerrorist) ||
+                (IncludeT && p.TeamNum == (byte)CsTeam.Terrorist) ||
+                (IncludeNone && p.TeamNum == (byte)CsTeam.None) ||
+                (IncludeSPEC && p.TeamNum == (byte)CsTeam.Spectator)))
+            .ToList();
+    }
+    public static int GetPlayersCount(bool IncludeBots = false, bool IncludeHLTV = false, bool IncludeSPEC = true, bool IncludeCT = true, bool IncludeT = true)
+    {
+        return Utilities.GetPlayers().Count(p =>
+            p != null &&
+            p.IsValid &&
+            p.Connected == PlayerConnectedState.Connected &&
+            (IncludeBots || !p.IsBot) &&
+            (IncludeHLTV || !p.IsHLTV) &&
+            ((IncludeCT && p.TeamNum == (byte)CsTeam.CounterTerrorist) ||
+            (IncludeT && p.TeamNum == (byte)CsTeam.Terrorist) ||
+            (IncludeSPEC && p.TeamNum == (byte)CsTeam.Spectator))
+        );
+    }
+
     public static void MuteCommands(CounterStrikeSharp.API.Modules.UserMessages.UserMessage? um, int Config, bool Fully = false)
     {
         if (um == null) return;
@@ -672,102 +699,122 @@ public class Helper
     {
         if (config < 0) return;
 
-        if (config is 0 or 5)
+        string color = config switch
         {
-            if (config == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-        }
-        else if (config == 1)
-        {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-        }
-        else if (config == 2)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-        }
-        else if (config == 3)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-        }
-        else if (config == 4)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-        }
+            0 => Con.Tomato,
+            1 => Con.OrangeYellow,
+            2 => Con.Cyan,
+            3 => Con.Orange,
+            4 => Con.Sky,
+            5 => Con.Emerald,
+            _ => Con.Reset
+        };
 
-        string output = $"[Game Manager] {message}";
-        Console.WriteLine(output);
-        Console.ResetColor();
+        Con.WriteLine($"{color}[Game Manager] {message}");
     }
 
-    public static void ExectueCommands()
+    public static void ExectueCommands(bool PushValues = false)
     {
-        if (Configs.Instance.BlockBotRadio)
-        {
-            Server.ExecuteCommand("bot_chatter off");
-        }
-
         if (Configs.Instance.BlockBots)
         {
             Server.ExecuteCommand("bot_kick");
         }
 
+        if (Configs.Instance.UseOnConVarChangedHook && !PushValues) return;
+
+        if (Configs.Instance.UseOnConVarChangedHook)
+        {
+            MainPlugin.Instance.g_Main.HookConVars.Clear();
+        }
+
+        if (Configs.Instance.BlockBotRadio)
+        {
+            Server.ExecuteCommand("bot_chatter off");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["bot_chatter"] = "off";
+        }
+
         if (Configs.Instance.BlockGrenadesRadio)
         {
-            Server.ExecuteCommand("sv_ignoregrenaderadio 1");
+            Server.ExecuteCommand("sv_ignoregrenaderadio true");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_ignoregrenaderadio"] = "true";
         }
 
         if (Configs.Instance.HideRadar)
         {
             Server.ExecuteCommand("sv_disable_radar 1");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_disable_radar"] = "1";
         }
 
         if (Configs.Instance.DisableFallDamage)
         {
             Server.ExecuteCommand("sv_falldamage_scale 0");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_falldamage_scale"] = "0";
         }
 
         if (Configs.Instance.DisableSvCheats_1)
         {
-            Server.ExecuteCommand("sv_cheats 0");
+            Server.ExecuteCommand("sv_cheats false");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_cheats"] = "false";
         }
 
         if (Configs.Instance.DisableC4)
         {
-            Server.ExecuteCommand("mp_give_player_c4 0");
+            Server.ExecuteCommand("mp_give_player_c4 false");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["mp_give_player_c4"] = "false";
         }
 
         if (Configs.Instance.DisableCameraSpectator)
         {
             Server.ExecuteCommand("sv_disable_observer_interpolation true");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_disable_observer_interpolation"] = "true";
         }
 
         if (Configs.Instance.Sounds_MutePlayersFootSteps)
         {
             Server.ExecuteCommand("sv_footsteps 0");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_footsteps"] = "0";
         }
 
         if (Configs.Instance.Sounds_MuteJumpLand)
         {
             Server.ExecuteCommand("sv_min_jump_landing_sound 999999");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_min_jump_landing_sound"] = "999999";
         }
 
         if (Configs.Instance.HideTeamMateHeadTag == 1)
         {
-            Server.ExecuteCommand("sv_teamid_overhead 0");
+            Server.ExecuteCommand("sv_teamid_overhead false");
+            if (Configs.Instance.UseOnConVarChangedHook)
+                MainPlugin.Instance.g_Main.HookConVars["sv_teamid_overhead"] = "false";
         }
         else if (Configs.Instance.HideTeamMateHeadTag == 2)
         {
-            Server.ExecuteCommand("sv_teamid_overhead 1; sv_teamid_overhead_always_prohibit 1; sv_teamid_overhead_maxdist 0");
+            Server.ExecuteCommand("sv_teamid_overhead true; sv_teamid_overhead_always_prohibit true; sv_teamid_overhead_maxdist false");
+            if (Configs.Instance.UseOnConVarChangedHook)
+            {
+                MainPlugin.Instance.g_Main.HookConVars["sv_teamid_overhead"] = "true";
+                MainPlugin.Instance.g_Main.HookConVars["sv_teamid_overhead_always_prohibit"] = "true";
+                MainPlugin.Instance.g_Main.HookConVars["sv_teamid_overhead_maxdist"] = "false";
+            }
         }
         else if (Configs.Instance.HideTeamMateHeadTag == 3 && Configs.Instance.HideTeamMateHeadTag_Distance > 0)
         {
-            Server.ExecuteCommand($"sv_teamid_overhead 1; sv_teamid_overhead_always_prohibit 1; sv_teamid_overhead_maxdist {Configs.Instance.HideTeamMateHeadTag_Distance}");
+            Server.ExecuteCommand($"sv_teamid_overhead true; sv_teamid_overhead_always_prohibit true; sv_teamid_overhead_maxdist {Configs.Instance.HideTeamMateHeadTag_Distance}");
+            if (Configs.Instance.UseOnConVarChangedHook)
+            {
+                MainPlugin.Instance.g_Main.HookConVars["sv_teamid_overhead"] = "true";
+                MainPlugin.Instance.g_Main.HookConVars["sv_teamid_overhead_always_prohibit"] = "true";
+                MainPlugin.Instance.g_Main.HookConVars["sv_teamid_overhead_maxdist"] = Configs.Instance.HideTeamMateHeadTag_Distance.ToString();
+            }
         }
     }
 
@@ -861,10 +908,23 @@ public class Helper
 
     public static void ReloadPlayersGlobals()
     {
-        foreach (var players in GetPlayersController(false, false, false))
+        foreach (var players in GetPlayersController(true, false, false))
         {
-            if (!players.IsValid()) continue;
-            _ = MainPlugin.Instance.HandlePlayerConnectionsAsync(players);
+            if (!players.IsValid(true)) continue;
+
+            CheckPlayerInGlobals(players);
+            CheckPlayerName(players);
+            SetPlayerClan(players);
+        }
+    }
+
+    public static void RenderBackPlayers()
+    {
+        foreach (var players in GetPlayersController(true, false, false))
+        {
+            if (!players.IsValid(true)) continue;
+
+            players.PlayerRender(255);
         }
     }
 
@@ -896,35 +956,30 @@ public class Helper
         }
     }
 
-    public static void CheckPlayerName(CCSPlayerController? getplayer)
+    public static void CheckPlayerName(CCSPlayerController? player)
     {
-        if (Configs.Instance.Filter_Players_Names < 1 || !getplayer.IsValid()) return;
-
+        if (Configs.Instance.Filter_Players_Names < 1 || !player.IsValid()) return;
         Server.NextFrame(() =>
         {
-            var player = getplayer;
             if (!player.IsValid()) return;
 
             string originalName = player.PlayerName;
             if (string.IsNullOrWhiteSpace(originalName)) return;
 
             string cleanedName = originalName;
-            string nameNoSpaces = originalName.Replace(" ", "");
             bool shouldRename = false;
 
             if (Configs.Instance.Filter_Players_Names == 1 || Configs.Instance.Filter_Players_Names == 3)
             {
                 var ipMatches = Regex.Matches(
-                    nameNoSpaces,
-                    @"(?<!\d)(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?!\d)"
+                    cleanedName,
+                    @"(?<!\d)(?:\d{1,4}\.){2,3}\d{1,4}(?!\d)"
                 );
-
                 var blockedIps = ipMatches.Cast<Match>()
                     .Select(m => m.Value)
                     .Where(ip => !Configs.Instance.Filter_Whitelist_Ips
                         .Any(w => ip.Equals(w, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
-
                 if (blockedIps.Count > 0)
                 {
                     cleanedName = blockedIps.Aggregate(
@@ -938,17 +993,15 @@ public class Helper
             if (Configs.Instance.Filter_Players_Names == 2 || Configs.Instance.Filter_Players_Names == 3)
             {
                 var urlMatches = Regex.Matches(
-                    nameNoSpaces,
+                    cleanedName,
                     @"(?:https?:\/\/)?(?:www\.)?(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s]*)?",
                     RegexOptions.IgnoreCase | RegexOptions.Compiled
                 );
-
                 var blockedUrls = urlMatches.Cast<Match>()
                     .Select(m => m.Value.Trim())
                     .Where(u => !string.IsNullOrEmpty(u))
                     .Where(u => !IsUrlWhitelisted(u, Configs.Instance.Filter_Whitelist_URLs))
                     .ToList();
-
                 if (blockedUrls.Count > 0)
                 {
                     cleanedName = blockedUrls.Aggregate(
@@ -962,64 +1015,10 @@ public class Helper
             if (shouldRename)
             {
                 cleanedName = Regex.Replace(cleanedName, @"\s+", " ").Trim();
+                if (string.IsNullOrWhiteSpace(cleanedName)) cleanedName = "Player";
                 player.Player_Name(cleanedName);
             }
         });
-    }
-
-    public static string GetGeoIsoCodeInfoAsync(string ipAddress)
-    {
-        if (!Configs.Instance.AutoSetPlayerLanguage || ipAddress == "127.0.0.1" || ipAddress.Contains("192.168."))
-            return "";
-
-        try
-        {
-            using var reader = new DatabaseReader(Path.GetFullPath(Path.Combine(MainPlugin.Instance.ModuleDirectory, "..", "..", "shared/GoldKingZ/GeoLocation/GeoLite2-City.mmdb")));
-
-            var response = reader.City(ipAddress);
-
-            return response.Country.IsoCode ?? "";
-        }
-        catch (Exception ex)
-        {
-            DebugMessage($"GetGeoIsoCodeInfoAsync Error {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-        }
-        return "";
-    }
-    public static void SetPlayerLanguage(CCSPlayerController? player, string isoCode)
-    {
-        if (!Configs.Instance.AutoSetPlayerLanguage || !player.IsValid()) return;
-        if (string.IsNullOrWhiteSpace(isoCode)) return;
-
-        try
-        {
-            var cultureInfo = CultureInfo
-            .GetCultures(CultureTypes.SpecificCultures)
-            .FirstOrDefault(c =>
-            {
-                try
-                {
-                    var region = new RegionInfo(c.LCID);
-                    return region.TwoLetterISORegionName.Equals(isoCode, StringComparison.OrdinalIgnoreCase);
-                }
-                catch
-                {
-                    return false;
-                }
-            });
-
-            if (cultureInfo == null)
-            {
-                cultureInfo = CultureInfo.CurrentCulture;
-            }
-
-            var steamId = (SteamID)player.SteamID;
-            PlayerLanguageManager.Instance.SetLanguage(steamId, cultureInfo);
-        }
-        catch (Exception ex)
-        {
-            DebugMessage($"SetPlayerLanguage Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-        }
     }
 
     public static void CheckPlayerInGlobals(CCSPlayerController player)
@@ -1038,319 +1037,35 @@ public class Helper
                 false,
                 false,
                 player.SteamID,
-                Configs.Instance.Disable_AimPunch.DisableAimPunch == 2 ? 1 : Configs.Instance.Disable_AimPunch.DisableAimPunch == 3 ? 2 : 0,
-                Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1 == 2 ? 1 : Configs.Instance.Custom_MuteSounds_1.Custom_MuteSounds1 == 3 ? 2 : 0,
-                Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2 == 2 ? 1 : Configs.Instance.Custom_MuteSounds_2.Custom_MuteSounds2 == 3 ? 2 : 0,
-                Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3 == 2 ? 1 : Configs.Instance.Custom_MuteSounds_3.Custom_MuteSounds3 == 3 ? 2 : 0,
                 "",
                 255,
                 false,
                 null!,
                 DateTime.MinValue,
+                DateTime.MinValue,
                 DateTime.MinValue
             );
             g_Main.Player_Data.TryAdd(player.Slot, initialData);
-        }
-
-        if (g_Main.Player_Data.TryGetValue(player.Slot, out var handle))
+        }else
         {
-            handle.Player = player;
+            g_Main.Player_Data[player.Slot].Player = player;
         }
     }
-
-    public static async Task LoadPlayerData(CCSPlayerController player)
-    {
-        try
-        {
-            var g_Main = MainPlugin.Instance.g_Main;
-            if (!player.IsValid() || g_Main.Player_Data.ContainsKey(player.Slot)) return;
-
-            var steamId = player.SteamID;
-
-            await Server.NextFrameAsync(() =>
-            {
-                if (!player.IsValid()) return;
-
-                CheckPlayerInGlobals(player);
-            });
-
-            if (Configs.Instance.Cookies_Enable > 0)
-            {
-                try
-                {
-                    await Server.NextFrameAsync(async () =>
-                    {
-                        if (!player.IsValid()) return;
-
-                        var cookieData = await Cookies.RetrievePersonDataById(steamId);
-                        if (cookieData.PlayerSteamID != 0)
-                        {
-                            UpdatePlayerData(player, cookieData);
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    DebugMessage($"LoadPlayerData Update Cookies Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                }
-            }
-
-
-            if (Configs.Instance.MySql_Enable > 0)
-            {
-                try
-                {
-                    var mysqlData = await MySqlDataManager.RetrievePersonDataByIdAsync(steamId);
-
-                    await Server.NextFrameAsync(() =>
-                    {
-                        if (!player.IsValid()) return;
-
-                        if (mysqlData.PlayerSteamID != 0)
-                        {
-                            UpdatePlayerData(player, mysqlData);
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    DebugMessage($"LoadPlayerData Update MySql Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            DebugMessage($"LoadPlayerData Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-        }
-    }
-
-
-
-    private static void UpdatePlayerData(CCSPlayerController player, Globals_Static.PersonData data)
-    {
-        if (!player.IsValid()) return;
-
-        var g_Main = MainPlugin.Instance.g_Main;
-        if (!g_Main.Player_Data.TryGetValue(player.Slot, out var handle)) return;
-
-
-        if (data.Toggle_AimPunch < 0 || data.Toggle_Custom_MuteSounds1 < 0 || data.Toggle_Custom_MuteSounds2 < 0 || data.Toggle_Custom_MuteSounds3 < 0)
-        {
-            if (data.Toggle_AimPunch < 0)
-            {
-                handle.Toggle_AimPunch = data.Toggle_AimPunch;
-            }
-            if (data.Toggle_Custom_MuteSounds1 < 0)
-            {
-                handle.Toggle_Custom_MuteSounds1 = data.Toggle_Custom_MuteSounds1;
-            }
-            if (data.Toggle_Custom_MuteSounds2 < 0)
-            {
-                handle.Toggle_Custom_MuteSounds2 = data.Toggle_Custom_MuteSounds2;
-            }
-            if (data.Toggle_Custom_MuteSounds3 < 0)
-            {
-                handle.Toggle_Custom_MuteSounds3 = data.Toggle_Custom_MuteSounds3;
-            }
-        }
-    }
-
-    public static async Task SavePlayerDataOnDisconnect(CCSPlayerController player)
-    {
-        try
-        {
-            if (!player.IsValid()) return;
-
-            var g_Main = MainPlugin.Instance.g_Main;
-            var steamId = player.SteamID;
-
-            if (g_Main.Player_Data.TryGetValue(player.Slot, out var alldata))
-            {
-                if (alldata == null) return;
-
-                if (alldata.Toggle_AimPunch < 0 || alldata.Toggle_Custom_MuteSounds1 < 0 || alldata.Toggle_Custom_MuteSounds2 < 0 || alldata.Toggle_Custom_MuteSounds3 < 0)
-                {
-                    var player_SteamID = alldata.SteamId;
-
-                    var player_Toggle_AimPunch = alldata.Toggle_AimPunch;
-                    var player_Toggle_Custom_MuteSounds1 = alldata.Toggle_Custom_MuteSounds1;
-                    var player_Toggle_Custom_MuteSounds2 = alldata.Toggle_Custom_MuteSounds2;
-                    var player_Toggle_Custom_MuteSounds3 = alldata.Toggle_Custom_MuteSounds3;
-
-                    if (Configs.Instance.Cookies_Enable == 1)
-                    {
-                        try
-                        {
-                            await Server.NextFrameAsync(async () =>
-                            {
-                                await Cookies.SaveToJsonFile(
-                                player_SteamID,
-                                player_Toggle_AimPunch,
-                                player_Toggle_Custom_MuteSounds1,
-                                player_Toggle_Custom_MuteSounds2,
-                                player_Toggle_Custom_MuteSounds3,
-                                DateTime.Now
-                                );
-
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            DebugMessage($"SavePlayerDataOnDisconnect Save Cookies Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                        }
-                    }
-
-                    if (Configs.Instance.MySql_Enable == 1)
-                    {
-                        try
-                        {
-                            await Server.NextFrameAsync(async () =>
-                            {
-                                await MySqlDataManager.SaveToMySqlAsync(new Globals_Static.PersonData
-                                {
-                                    PlayerSteamID = player_SteamID,
-                                    Toggle_AimPunch = player_Toggle_AimPunch,
-                                    Toggle_Custom_MuteSounds1 = player_Toggle_Custom_MuteSounds1,
-                                    Toggle_Custom_MuteSounds2 = player_Toggle_Custom_MuteSounds2,
-                                    Toggle_Custom_MuteSounds3 = player_Toggle_Custom_MuteSounds3,
-                                    DateAndTime = DateTime.Now
-                                });
-
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            DebugMessage($"SavePlayerDataOnDisconnect Save MySql Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                        }
-                    }
-                }
-
-                g_Main.Player_Data.Remove(player.Slot);
-            }
-        }
-        catch (Exception ex)
-        {
-            DebugMessage($"SavePlayerDataOnDisconnect Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-        }
-    }
-
-    public static void SavePlayersValues()
-    {
-        var g_Main = MainPlugin.Instance.g_Main;
-        foreach (var alldata in g_Main.Player_Data.Values)
-        {
-            if (alldata == null)
-            {
-                g_Main.Player_Data.Clear();
-                return;
-            }
-
-            if (alldata.Toggle_AimPunch < 0 || alldata.Toggle_Custom_MuteSounds1 < 0 || alldata.Toggle_Custom_MuteSounds2 < 0 || alldata.Toggle_Custom_MuteSounds3 < 0)
-            {
-                var player_SteamID = alldata.SteamId;
-
-                var player_Toggle_AimPunch = alldata.Toggle_AimPunch;
-                var player_Toggle_Custom_MuteSounds1 = alldata.Toggle_Custom_MuteSounds1;
-                var player_Toggle_Custom_MuteSounds2 = alldata.Toggle_Custom_MuteSounds2;
-                var player_Toggle_Custom_MuteSounds3 = alldata.Toggle_Custom_MuteSounds3;
-
-                if (Configs.Instance.Cookies_Enable == 2)
-                {
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            await Cookies.SaveToJsonFile(
-                            player_SteamID,
-                            player_Toggle_AimPunch,
-                            player_Toggle_Custom_MuteSounds1,
-                            player_Toggle_Custom_MuteSounds2,
-                            player_Toggle_Custom_MuteSounds3,
-                            DateTime.Now
-                            );
-                        }
-                        catch (Exception ex)
-                        {
-                            DebugMessage($"SavePlayersValues Save Cookies Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                        }
-                    });
-                }
-
-
-                if (Configs.Instance.MySql_Enable == 2)
-                {
-                    _ = Task.Run(async () =>
-                    {
-                        try
-                        {
-                            await MySqlDataManager.SaveToMySqlAsync(new Globals_Static.PersonData
-                            {
-                                PlayerSteamID = player_SteamID,
-                                Toggle_AimPunch = player_Toggle_AimPunch,
-                                Toggle_Custom_MuteSounds1 = player_Toggle_Custom_MuteSounds1,
-                                Toggle_Custom_MuteSounds2 = player_Toggle_Custom_MuteSounds2,
-                                Toggle_Custom_MuteSounds3 = player_Toggle_Custom_MuteSounds3,
-                                DateAndTime = DateTime.Now
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            DebugMessage($"SavePlayersValues Save MySql Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                        }
-                    });
-                }
-            }
-        }
-
-        g_Main.Player_Data.Clear();
-
-        if (Configs.Instance.Cookies_Enable > 0)
-        {
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Cookies.RemoveOldEntries();
-                }
-                catch (Exception ex)
-                {
-                    DebugMessage($"SavePlayersValues Remove Cookies Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                }
-            });
-        }
-
-        if (Configs.Instance.MySql_Enable > 0)
-        {
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await MySqlDataManager.DeleteOldPlayersAsync();
-                }
-                catch (Exception ex)
-                {
-                    DebugMessage($"SavePlayersValues Remove MySql Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
-                }
-            });
-        }
-    }
-
 
     public static void RemoveHideDeadBody(CCSPlayerController player)
     {
-        if (Configs.Instance.HideDeadBody < 1) return;
-
         var g_Main = MainPlugin.Instance.g_Main;
 
         if (!player.IsValid(true)) return;
 
-        CheckPlayerInGlobals(player);
-
-        if (g_Main.Player_Data.TryGetValue(player.Slot, out var handle))
+        if (Configs.Instance.HideDeadBody > 0)
         {
-            handle.Timer_DeadBody?.Kill();
-            handle.Timer_DeadBody = null!;
-            handle.PlayerAlpha = 255;
+            if (g_Main.Player_Data.TryGetValue(player.Slot, out var handle))
+            {
+                handle.Timer_DeadBody?.Kill();
+                handle.Timer_DeadBody = null!;
+                handle.PlayerAlpha = 255;
+            }
         }
 
         if (Configs.Instance.HideDeadBody > 0)
@@ -1371,20 +1086,13 @@ public class Helper
 
         if (!player.IsValid(true) || player.IsAlive() && !player.ControllingBot) return;
 
-        CheckPlayerInGlobals(player);
-
         var PlayerPawn = player.PlayerPawn;
         if (PlayerPawn == null || !PlayerPawn.IsValid) return;
 
         var PlayerPawnValue = PlayerPawn.Value;
         if (PlayerPawnValue == null || !PlayerPawnValue.IsValid) return;
 
-        var orginalmodel = PlayerPawnValue.CBodyComponent?.SceneNode?.GetSkeletonInstance()?.ModelState.ModelName ?? string.Empty;
-        if (!string.IsNullOrEmpty(orginalmodel))
-        {
-            PlayerPawnValue.SetModel("characters/models/tm_jumpsuit/tm_jumpsuit_varianta.vmdl");
-            PlayerPawnValue.SetModel(orginalmodel);
-        }
+        player.SetBodygroup("first_or_third_person", 0);
 
         if (Configs.Instance.HideDeadBody == 1)
         {
@@ -1436,7 +1144,11 @@ public class Helper
 
     public static void HideChatHUD(CCSPlayerController player)
     {
-        if (Configs.Instance.HideChatHUD_Delay < 1 || !player.IsValid(true)) return;
+        if (Configs.Instance.HideChatHUD < 1 || !player.IsValid(true)) return;
+
+        if (!MainPlugin.Instance.g_Main.Player_Data.TryGetValue(player.Slot, out var playerData)) return;
+        bool onetime = (DateTime.Now - playerData.EventPlayerChat).TotalSeconds > 0.4;
+        if (onetime) playerData.EventPlayerChat = DateTime.Now;
 
         if (Configs.Instance.HideChatHUD == 1)
         {
@@ -1444,7 +1156,7 @@ public class Helper
         }
         else if (Configs.Instance.HideChatHUD == 2 && Configs.Instance.HideChatHUD_Delay > 0)
         {
-            AdvancedPlayerPrintToChat(player, null!, MainPlugin.Instance.Localizer["PrintToChatToPlayer.HideChat.Warning"], Configs.Instance.HideChatHUD_Delay);
+            if(onetime) AdvancedPlayerPrintToChat(player, null!, MainPlugin.Instance.Localizer["PrintToChatToPlayer.HideChat.Warning"], Configs.Instance.HideChatHUD_Delay);
 
             MainPlugin.Instance.AddTimer(Configs.Instance.HideChatHUD_Delay, () =>
             {
@@ -1586,13 +1298,10 @@ public class Helper
     public static void Timer_AutoClean_Callback()
     {
         var g_Main = MainPlugin.Instance.g_Main;
-
         var selectedWeapons = Configs.Instance.AutoClean_TheseDroppedWeaponsOnly
             .Select(weapon => weapon.Trim().ToLower())
             .ToList();
-
-        var allWeaponsToClean = new HashSet<string>();
-
+        var allWeaponsToClean = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if (selectedWeapons.Contains("ANY", StringComparer.OrdinalIgnoreCase) || selectedWeapons.Count == 0)
         {
             foreach (var category in WeaponCategories.Values)
@@ -1615,6 +1324,12 @@ public class Helper
             }
         }
 
+        var searchNames = new HashSet<string>(allWeaponsToClean, StringComparer.OrdinalIgnoreCase);
+        if (searchNames.Contains("weapon_m4a1_silencer"))
+            searchNames.Add("weapon_m4a1");
+        if (searchNames.Contains("weapon_usp_silencer"))
+            searchNames.Add("weapon_hkp2000");
+
         for (int i = g_Main.CbaseWeapons.Count - 1; i >= 0; i--)
         {
             var weapon = g_Main.CbaseWeapons[i];
@@ -1623,47 +1338,534 @@ public class Helper
                 g_Main.CbaseWeapons.RemoveAt(i);
                 continue;
             }
-
             if (weapon.OwnerEntity != null && weapon.OwnerEntity.IsValid)
             {
                 g_Main.CbaseWeapons.RemoveAt(i);
             }
         }
-
-        foreach (var weaponClass in allWeaponsToClean)
+        foreach (var weaponClass in searchNames)
         {
             foreach (var entity in Utilities.FindAllEntitiesByDesignerName<CBaseEntity>(weaponClass))
             {
                 if (entity == null || !entity.IsValid || g_Main.CbaseWeapons.Contains(entity)) continue;
 
+                var asWeapon = entity.As<CBasePlayerWeapon>();
+                string realName = CheckSilencerWeapons(asWeapon);
+                if (!allWeaponsToClean.Contains(realName)) continue;
+
                 if (entity.OwnerEntity == null || !entity.OwnerEntity.IsValid)
                 {
                     g_Main.CbaseWeapons.Add(entity);
                 }
+            }
+        }
+        for (int i = g_Main.CbaseWeapons.Count - 1; i >= Configs.Instance.AutoClean_MaxWeaponsOnGround; i--)
+        {
+            var weaponToRemove = g_Main.CbaseWeapons[i];
+            g_Main.CbaseWeapons.RemoveAt(i);
 
+            if (weaponToRemove == null || !weaponToRemove.IsValid) continue;
+            if (weaponToRemove.OwnerEntity == null || !weaponToRemove.OwnerEntity.IsValid)
+            {
+                weaponToRemove.AcceptInput("Kill");
+            }
+        }
+    }
+    
+    public class MenuEntry
+    {
+        [String("SteamIDs", "Flags", "Groups")]
+        public string Flags { get; set; } = "SteamIDs: 76561198206086993,STEAM_0:1:507335558 | Flags: @css/root,@root,admin | Groups: #css/root,#root,admin";
+    }
+
+    public static void LoadJson(bool playerload = false, CCSPlayerController player = null!, CommandInfo info = null!)
+    {
+        LoadJsonFile("config/chat_processor.json",   v => MainPlugin.Instance.g_Main.JsonData = v,        playerload, player, info);
+        LoadJsonFile("config/weapons_config.json",   v => MainPlugin.Instance.g_Main.JsonData_Weapon = v, playerload, player, info);
+    }
+
+    private static void LoadJsonFile(string relativePath, Action<JObject?> assign,
+                                    bool playerload, CCSPlayerController player, CommandInfo info)
+    {
+        if (playerload && !player.IsValid()) return;
+
+        string path = Path.Combine(MainPlugin.Instance.ModuleDirectory, relativePath);
+        string fileName = Path.GetFileName(relativePath);
+
+        void Notify(string message, bool successfully = false)
+        {
+            if (playerload)
+            {
+                string color = successfully ? "\x06" : "\x02";
+                AdvancedPlayerPrintToChat(player, info, $" \x04[Game Manager]: {color}{message}");
+            }
+            DebugMessage(message, Configs.Instance.EnableDebug.ToDebugConfig(1));
+        }
+
+        try
+        {
+            if (!File.Exists(path))
+            {
+                Notify($"{path} file does not exist.");
+                assign(null);
+                return;
+            }
+
+            string[] allLines = File.ReadAllLines(path);
+            string jsonContent = string.Join("\n", allLines.Where(l => !l.TrimStart().StartsWith("//")));
+
+            if (string.IsNullOrWhiteSpace(jsonContent))
+            {
+                Notify($"{path} content is empty.");
+                assign(null);
+                return;
+            }
+
+            var parsed = JObject.Parse(jsonContent);
+
+            foreach (var property in parsed.Properties().ToList())
+            {
+                if (property.Name.Equals("ANY", StringComparison.OrdinalIgnoreCase)) continue;
+
+                var entry = new MenuEntry { Flags = property.Name };
+                Configs.ValidateStringRecursive(entry);
+
+                if (entry.Flags != property.Name)
+                {
+                    var value = parsed[property.Name];
+                    parsed.Remove(property.Name);
+                    parsed[entry.Flags] = value;
+                }
+            }
+
+            assign(parsed);
+
+            var formattedJson = parsed.ToString(Formatting.Indented);
+            var commentLines = allLines.Where(l => l.TrimStart().StartsWith("//")).ToList();
+
+            if (commentLines.Count > 0) commentLines.Add("");
+            commentLines.Add(formattedJson);
+
+            File.WriteAllText(path, string.Join(Environment.NewLine, commentLines));
+
+            Notify($"{path} Loaded Successfully", true);
+        }
+        catch (JsonReaderException ex)
+        {
+            Notify($"JSON Syntax Error in {fileName}: {ex.Message}");
+            assign(null);
+        }
+        catch (Exception ex)
+        {
+            Notify($"General Error loading {fileName}: {ex.Message}");
+            assign(null);
+        }
+    }
+
+    public static bool IsUrlWhitelisted(string detectedUrl, List<string> whitelist)
+    {
+        var normalizedDetected = detectedUrl.Replace(" ", "").ToLower();
+
+        foreach (var whitelistEntry in whitelist)
+        {
+            var normalizedWhitelist = whitelistEntry.Trim().Replace(" ", "").ToLower();
+
+            var schemeless = normalizedWhitelist
+                .Replace("https://", "")
+                .Replace("http://", "");
+
+            var slashIdx = schemeless.IndexOf('/');
+            bool hasPath = slashIdx >= 0 && slashIdx < schemeless.Length - 1;
+
+            if (hasPath)
+            {
+                var detectedSchemeless = normalizedDetected
+                    .Replace("https://", "")
+                    .Replace("http://", "");
+
+                if (detectedSchemeless.StartsWith("www.")) detectedSchemeless = detectedSchemeless.Substring(4);
+                if (schemeless.StartsWith("www.")) schemeless = schemeless.Substring(4);
+
+                if (detectedSchemeless.TrimEnd('/') == schemeless.TrimEnd('/'))
+                    return true;
+            }
+            else
+            {
+                var whitelistDomain = GetDomain(normalizedWhitelist);
+                var detectedDomain  = GetDomain(normalizedDetected);
+
+                if (detectedDomain == whitelistDomain)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public static string GetDomain(string url)
+    {
+        url = url.Replace("https://", "").Replace("http://", "");
+        if (url.StartsWith("www.")) url = url.Substring(4);
+
+        var slashIndex = url.IndexOf('/');
+        if (slashIndex >= 0)
+            url = url.Substring(0, slashIndex);
+
+        return url.TrimEnd('/');
+    }
+
+    public static BlockMapSaying_Rule? GetBlockMapSayingRule()
+    {
+        var availableKeys = Configs.Instance.BlockMapSaying_Filter.Select(r => r.MapName);
+        var matchedKey = Server.MapName.GetBestMapMatch(availableKeys);
+        if (matchedKey == null) return null;
+
+        return Configs.Instance.BlockMapSaying_Filter
+            .FirstOrDefault(r => r.MapName.Equals(matchedKey, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static void DisableChickenFromSpawn(CEntityInstance entity)
+    {
+        if(!Configs.Instance.DisableChickenFromSpawn)return;
+        if (entity == null || !entity.IsValid || entity.DesignerName != "chicken") return;
+
+        entity.AcceptInput("kill");
+    }
+
+    public class WeaponJsonSettings
+    {
+        public int? Clip { get; set; }
+        public int? Ammo { get; set; }
+        public bool UnlimitedClip { get; set; } = false;
+        public bool UnlimitedAmmo { get; set; } = false;
+        public bool UseOldReload { get; set; } = false;
+    }
+
+    private static WeaponJsonSettings ParseWeaponObject(JObject obj) => new()
+    {
+        Clip          = obj["Clip"]?.Value<int?>(),
+        Ammo          = obj["Ammo"]?.Value<int?>(),
+        UnlimitedClip = obj["UnlimitedClip"]?.Value<bool?>() ?? false,
+        UnlimitedAmmo = obj["UnlimitedAmmo"]?.Value<bool?>() ?? false,
+        UseOldReload  = obj["UseOldReload"]?.Value<bool?>() ?? false,
+    };
+
+    public static WeaponJsonSettings? GetSettings(CCSPlayerController? player, string weaponName)
+    {
+        var json = MainPlugin.Instance.g_Main.JsonData_Weapon;
+        if (json == null || string.IsNullOrEmpty(weaponName)) return null;
+
+        if (player.IsValid(true))
+        {
+            foreach (var prop in json.Properties())
+            {
+                if (prop.Name.Equals("ANY", StringComparison.OrdinalIgnoreCase)) continue;
+                if (!prop.Name.HasValidPermissionData()) continue;
+                if (!IsPlayerInGroupPermission(player, prop.Name)) continue;
+
+                return (prop.Value as JObject)?[weaponName] is JObject weaponObj
+                    ? ParseWeaponObject(weaponObj)
+                    : null;
             }
         }
 
-        if (g_Main.CbaseWeapons.Count > Configs.Instance.AutoClean_MaxWeaponsOnGround)
+        return json["ANY"] is JObject anyGroup && anyGroup[weaponName] is JObject anyWeapon
+            ? ParseWeaponObject(anyWeapon)
+            : null;
+    }
+
+    public static string CheckSilencerWeapons(CBasePlayerWeapon? w)
+    {
+        if (w == null || !w.IsValid) return "";
+        string baseName = w.DesignerName ?? "";
+        if (string.IsNullOrEmpty(baseName)) return "";
+
+        try
         {
-            int weaponsToRemove = g_Main.CbaseWeapons.Count - Configs.Instance.AutoClean_MaxWeaponsOnGround;
+            var econ = w.As<CCSWeaponBase>();
+            if (econ == null) return baseName;
 
-            for (int i = 0; i < weaponsToRemove && g_Main.CbaseWeapons.Count > 0; i++)
+            ushort idx = econ.AttributeManager.Item.ItemDefinitionIndex;
+            return idx switch
             {
-                int weaponToRemoveIndex = g_Main.CbaseWeapons.Count == 1 ? 0 : Random.Shared.Next(0, g_Main.CbaseWeapons.Count - 1);
+                60 => "weapon_m4a1_silencer",
+                61 => "weapon_usp_silencer",
+                _  => baseName,
+            };
+        }
+        catch
+        {
+            return baseName;
+        }
+    }
 
-                var weaponToRemove = g_Main.CbaseWeapons[weaponToRemoveIndex];
-                if (weaponToRemove == null || !weaponToRemove.IsValid) continue;
+    public static void DisableNewReloadClips(CEntityInstance entity)
+    {
+        if (entity == null || !entity.IsValid) return;
+        if (entity.DesignerName == null || !entity.DesignerName.StartsWith("weapon_")) return;
 
-                if (weaponToRemove.OwnerEntity == null || !weaponToRemove.OwnerEntity.IsValid)
+        Server.NextFrame(() =>
+        {
+            if (entity == null || !entity.IsValid) return;
+            if (entity.DesignerName == null || !entity.DesignerName.StartsWith("weapon_")) return;
+
+            var weapon = entity.As<CBasePlayerWeapon>();
+            if (weapon == null || !weapon.IsValid) return;
+
+            var ownerEntity = weapon.OwnerEntity.Value;
+            if (ownerEntity == null || !ownerEntity.IsValid) return;
+
+            var pawn = ownerEntity.As<CCSPlayerPawn>();
+            if (pawn == null || !pawn.IsValid) return;
+
+            var player = pawn.Controller.Value?.As<CCSPlayerController>();
+            if (player == null || !player.IsValid(true)) return;
+
+            string weaponName = CheckSilencerWeapons(weapon);
+            var settings = GetSettings(player, weaponName);
+            if (settings == null) return;
+
+            bool changed = false;
+
+            if (settings.Clip.HasValue)
+            {
+                weapon.Clip1 = settings.Clip.Value;
+                changed = true;
+            }
+
+            if (settings.Ammo.HasValue)
+            {
+                weapon.ReserveAmmo[0] = settings.Ammo.Value;
+                changed = true;
+            }
+
+            if (changed)
+            {
+                Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_iClip1");
+                Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_pReserveAmmo");
+            }
+        });
+    }
+
+    public static void DeleteNewReloadClips(CEntityInstance entity)
+    {
+        if (entity == null || !entity.IsValid) return;
+        if (entity.DesignerName == null || !entity.DesignerName.StartsWith("weapon_")) return;
+
+        try
+        {
+            var weapon = entity.As<CBasePlayerWeapon>();
+            if (weapon == null) return;
+
+            var ownerEntity = weapon.OwnerEntity.Value;
+            if (ownerEntity == null || !ownerEntity.IsValid) return;
+
+            var pawn = ownerEntity.As<CCSPlayerPawn>();
+            if (pawn == null || !pawn.IsValid) return;
+
+            var player = pawn.Controller.Value?.As<CCSPlayerController>();
+            if (player == null || !player.IsValid(true)) return;
+            if (MainPlugin.Instance.g_Main.ActiveReloadId.ContainsKey(player.Slot))
+            {
+                MainPlugin.Instance.g_Main.ActiveReloadId.Remove(player.Slot);
+            }
+        }
+        catch { }
+    }
+
+    public static void StartReloadLoop(CCSPlayerController player, CBasePlayerWeapon weapon, WeaponJsonSettings settings)
+    {
+        if(!player.IsValid(true))return;
+
+        int slot = player.Slot;
+        uint weaponIdx = weapon.Index;
+        int preClip = weapon.Clip1;
+        int lastReserve = weapon.ReserveAmmo[0];
+
+        long myId = MainPlugin.Instance.g_Main.GetNextReloadId();
+        MainPlugin.Instance.g_Main.ActiveReloadId[slot] = myId;
+
+        int framesLeft = 400;
+
+        void CheckFrame()
+        {
+            framesLeft--;
+
+            if (!player.IsValid(true) || !weapon.IsValid || framesLeft <= 0)
+            {
+                if (MainPlugin.Instance.g_Main.ActiveReloadId.TryGetValue(slot, out long id) && id == myId)
+                    MainPlugin.Instance.g_Main.ActiveReloadId.Remove(slot);
+                return;
+            }
+
+            if (!MainPlugin.Instance.g_Main.ActiveReloadId.TryGetValue(slot, out long currentId) || currentId != myId)
+            {
+                return;
+            }
+
+            var pawn = player.PlayerPawn?.Value;
+            if (pawn?.WeaponServices?.ActiveWeapon?.Value?.Index != weaponIdx)
+            {
+                MainPlugin.Instance.g_Main.ActiveReloadId.Remove(slot);
+                return;
+            }
+
+            if (weapon.Clip1 == preClip)
+            {
+                lastReserve = weapon.ReserveAmmo[0];
+                Server.NextFrame(CheckFrame);
+                return;
+            }
+
+            
+            MainPlugin.Instance.g_Main.ActiveReloadId.Remove(slot);
+
+            if (settings.UnlimitedClip)
+            {
+                if (settings.Clip.HasValue)
+                    weapon.Clip1 = settings.Clip.Value;
+
+                if (settings.Ammo.HasValue)
+                    weapon.ReserveAmmo[0] = settings.Ammo.Value;
+            }
+            else if (settings.UseOldReload)
+            {
+                int maxClip = settings.Clip ?? weapon.Clip1;
+                int needed = maxClip - preClip;
+                int canTake = Math.Min(needed, lastReserve);
+                weapon.Clip1 = preClip + canTake;
+                weapon.ReserveAmmo[0] = settings.UnlimitedAmmo
+                    ? lastReserve
+                    : lastReserve - canTake;
+            }
+            else
+            {
+                bool clipNeedsFix = settings.Clip.HasValue && weapon.Clip1 != settings.Clip!.Value;
+
+                if (clipNeedsFix)
+                    weapon.Clip1 = settings.Clip!.Value;
+
+                if (settings.UnlimitedAmmo)
+                    weapon.ReserveAmmo[0] = lastReserve;
+                else if (settings.Ammo.HasValue || clipNeedsFix)
+                    weapon.ReserveAmmo[0] = Math.Max(0, lastReserve - 1);
+            }
+
+            Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_iClip1");
+            Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_pReserveAmmo");
+        }
+
+        Server.NextFrame(CheckFrame);
+    }
+
+    public static void DisableNewReloadClipsGlobal(CEntityInstance entity)
+    {
+        if (entity == null || !entity.IsValid) return;
+        if (entity.DesignerName == null || !entity.DesignerName.StartsWith("weapon_")) return;
+
+        Server.NextFrame(() =>
+        {
+            if (entity == null || !entity.IsValid) return;
+            if (entity.DesignerName == null || !entity.DesignerName.StartsWith("weapon_")) return;
+
+            var weapon = entity.As<CBasePlayerWeapon>();
+            if (weapon == null || !weapon.IsValid) return;
+
+            try
+            {
+                var weaponBase = weapon.As<CCSWeaponBase>();
+                var vdata = weaponBase?.VData;
+                if (vdata == null) return;
+
+                if (!vdata.ReserveAmmoAsClips) return;
+
+                int maxClip = vdata.MaxClip1;
+                int originalMaxMags = vdata.PrimaryReserveAmmoMax;
+
+                vdata.ReserveAmmoAsClips = false;
+                vdata.PrimaryReserveAmmoMax = maxClip * originalMaxMags;
+
+                weapon.ReserveAmmo[0] = maxClip * weapon.ReserveAmmo[0];
+                Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_pReserveAmmo");
+            }
+            catch { }
+        });
+    }
+
+    public static void ReapplyWeaponAmmo(CCSPlayerController player)
+    {
+        if (Configs.Instance.DisableNewReloadClips == 0 || !player.IsValid(true)) return;
+
+        var pawn = player.PlayerPawn?.Value;
+        if (pawn == null || !pawn.IsValid) return;
+
+        var weapons = pawn.WeaponServices?.MyWeapons;
+        if (weapons == null) return;
+
+        foreach (var weaponHandle in weapons)
+        {
+            var weapon = weaponHandle.Value;
+            if (weapon == null || !weapon.IsValid) continue;
+
+            if (Configs.Instance.DisableNewReloadClips == 1)
+            {
+                try
                 {
-                    weaponToRemove.AcceptInput("Kill");
+                    var weaponBase = weapon.As<CCSWeaponBase>();
+                    var vdata = weaponBase?.VData;
+                    if (vdata == null || vdata.ReserveAmmoAsClips) continue;
+
+                    weapon.ReserveAmmo[0] = vdata.PrimaryReserveAmmoMax;
+                    Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_pReserveAmmo");
                 }
-                g_Main.CbaseWeapons.RemoveAt(weaponToRemoveIndex);
+                catch { }
+            }
+            else if (Configs.Instance.DisableNewReloadClips == 2)
+            {
+                string weaponName = CheckSilencerWeapons(weapon);
+                var settings = GetSettings(player, weaponName);
+                if (settings == null) continue;
+
+                bool changed = false;
+
+                if (settings.Clip.HasValue)
+                {
+                    weapon.Clip1 = settings.Clip.Value;
+                    changed = true;
+                }
+
+                if (settings.Ammo.HasValue)
+                {
+                    weapon.ReserveAmmo[0] = settings.Ammo.Value;
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_iClip1");
+                    Utilities.SetStateChanged(weapon, "CBasePlayerWeapon", "m_pReserveAmmo");
+                }
             }
         }
     }
 
+    public static void DownloadMissingFiles()
+    {
+        if(MainPlugin.Instance.g_Main.Downloading_FromGithub)return;
+
+        MainPlugin.Instance.g_Main.Downloading_FromGithub = true;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await DownloadMissingFilesAsync();
+            }
+            finally
+            {
+                MainPlugin.Instance.g_Main.Downloading_FromGithub = false;
+            }
+        });
+    }
     public static async Task DownloadMissingFilesAsync()
     {
         try
@@ -1677,36 +1879,38 @@ public class Helper
                 }
                 catch
                 {
-                    
+
                 }
             }
             
-            await DownloadMissingFiles();
+            await Start_DownloadMissingFiles();
+            await Server.NextFrameAsync(CustomGameData.Load);
         }
         catch (Exception ex)
         {
-            DebugMessage($"DownloadMissingFiles failed: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
+            DebugMessage($"DownloadMissingFilesAsync failed: {ex.Message}");
         }
     }
-
-    public static async Task DownloadMissingFiles()
+    public static async Task Start_DownloadMissingFiles()
     {
         try
         {
-            string settingsFileName = "config/chat_processor.json";
-            string settingsGithubUrl = "https://raw.githubusercontent.com/oqyh/cs2-Game-Manager-GoldKingZ/main/Resources/chat_processor.json";
-            await DownloadFromGitHub(settingsFileName, settingsGithubUrl);
-
-            string geoFileName = Path.GetFullPath(Path.Combine(MainPlugin.Instance.ModuleDirectory, "..", "..", "shared/GoldKingZ/GeoLocation/GeoLite2-City.mmdb"));
-            string geoUpdateUrl = "https://raw.githubusercontent.com/oqyh/cs2-Connect-Disconnect-Sound-GoldKingZ/main/Resources/update.txt";
-            await DownloadFromGitHub(geoFileName, geoUpdateUrl, Configs.Instance.AutoUpdateGeoLocation);
+            string localPath_gamedata = Path.Combine(MainPlugin.Instance.ModuleDirectory, "gamedata/gamedata.json");
+            string githubUrl_gamedata = "https://raw.githubusercontent.com/oqyh/cs2-Private-Plugins/main/Resources/gamedata.json";
+            await DownloadFromGitHub(localPath_gamedata, githubUrl_gamedata, Configs.Instance.AutoUpdateSignatures);
+            
         }
         catch (Exception ex)
         {
-            DebugMessage($"DownloadMissingFiles Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
+            DebugMessage($"DownloadMissingFiles Error: {ex.Message}");
         }
     }
 
+    private static readonly HttpClient _httpClient_Github = new HttpClient
+    {
+        Timeout = TimeSpan.FromSeconds(50)
+    };
+    private static readonly TimeSpan _timeout_Github = TimeSpan.FromSeconds(50);
     public static async Task DownloadFromGitHub(string filePath, string githubUrl, bool AutoUpdate = false)
     {
         try
@@ -1719,19 +1923,23 @@ public class Helper
                 Directory.CreateDirectory(dir);
             }
 
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", $"CS2-Plugin-Game-Manager");
-            client.Timeout = TimeSpan.FromSeconds(50);
+            _httpClient_Github.DefaultRequestHeaders.Remove("User-Agent");
+            _httpClient_Github.DefaultRequestHeaders.Add("User-Agent", "CS2-Game-Manager");
 
             string actualDownloadUrl = githubUrl;
 
             if (githubUrl.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
             {
-                actualDownloadUrl = await client.GetStringAsync(githubUrl);
-                actualDownloadUrl = actualDownloadUrl.Trim();
+                using var ctsTxt = new CancellationTokenSource(_timeout_Github);
+                var txtResponse = await _httpClient_Github.GetAsync(githubUrl, ctsTxt.Token);
+                txtResponse.EnsureSuccessStatusCode();
+                actualDownloadUrl = (await txtResponse.Content.ReadAsStringAsync()).Trim();
             }
 
-            byte[] remoteBytes = await client.GetByteArrayAsync(actualDownloadUrl);
+            using var ctsBytes = new CancellationTokenSource(_timeout_Github);
+            var bytesResponse = await _httpClient_Github.GetAsync(actualDownloadUrl, ctsBytes.Token);
+            bytesResponse.EnsureSuccessStatusCode();
+            byte[] remoteBytes = await bytesResponse.Content.ReadAsByteArrayAsync();
 
             bool needDownload = !File.Exists(fullPath);
 
@@ -1751,126 +1959,7 @@ public class Helper
         }
         catch (Exception ex)
         {
-            DebugMessage($"DownloadFromGitHub Error: {ex.Message}", Configs.Instance.EnableDebug.ToDebugConfig(1));
+            DebugMessage($"DownloadFromGitHub Error: {ex.Message}");
         }
     }
-
-    public class MenuEntry
-    {
-        [String("SteamIDs", "Flags", "Groups")]
-        public string Flags { get; set; } = "SteamIDs: 76561198206086993,STEAM_0:1:507335558 | Flags: @css/root,@root,admin | Groups: #css/root,#root,admin";
-    }
-    public static void LoadJson(bool playerload = false, CCSPlayerController player = null!, CommandInfo info = null!)
-    {
-        var g_Main = MainPlugin.Instance.g_Main;
-        if (playerload && !player.IsValid()) return;
-
-        string path = Path.Combine(MainPlugin.Instance.ModuleDirectory, "config/chat_processor.json");
-
-        void Notify(string message, bool successfully = false)
-        {
-            if (playerload)
-            {
-                string color = successfully ? "\x06" : "\x02";
-                AdvancedPlayerPrintToChat(player, info, $" \x04[Game Manager]: {color}{message}");
-            }
-            DebugMessage(message, Configs.Instance.EnableDebug.ToDebugConfig(1));
-        }
-
-        try
-        {
-            if (!File.Exists(path))
-            {
-                Notify($"{path} file does not exist.");
-                g_Main.JsonData = null;
-                return;
-            }
-
-            string[] allLines = File.ReadAllLines(path);
-            string jsonContent = string.Join("\n", allLines.Where(l => !l.TrimStart().StartsWith("//")));
-
-            if (string.IsNullOrWhiteSpace(jsonContent))
-            {
-                Notify($"{path} content is empty.");
-                g_Main.JsonData = null;
-                return;
-            }
-
-            g_Main.JsonData = JObject.Parse(jsonContent);
-
-            foreach (var property in g_Main.JsonData.Properties().ToList())
-            {
-                if (property.Name.Equals("ANY", StringComparison.OrdinalIgnoreCase)) continue;
-
-                var entry = new MenuEntry { Flags = property.Name };
-                Configs.ValidateStringRecursive(entry);
-
-                if (entry.Flags != property.Name)
-                {
-                    var value = g_Main.JsonData[property.Name];
-                    g_Main.JsonData.Remove(property.Name);
-                    g_Main.JsonData[entry.Flags] = value;
-                }
-            }
-
-            var formattedJson = g_Main.JsonData.ToString(Formatting.Indented);
-            var commentLines = allLines.Where(l => l.TrimStart().StartsWith("//")).ToList();
-
-            if (commentLines.Count > 0) commentLines.Add("");
-            commentLines.Add(formattedJson);
-
-            File.WriteAllText(path, string.Join(Environment.NewLine, commentLines));
-
-            Notify($"{path} Loaded Successfully", true);
-        }
-        catch (JsonReaderException ex)
-        {
-            Notify($"JSON Syntax Error in chat_processor.json: {ex.Message}");
-            g_Main.JsonData = null;
-        }
-        catch (Exception ex)
-        {
-            Notify($"General Error loading chat_processor.json: {ex.Message}");
-            g_Main.JsonData = null;
-        }
-    }
-
-    public static bool IsUrlWhitelisted(string detectedUrl, List<string> whitelist)
-    {
-        var normalizedDetected = detectedUrl.Replace(" ", "").ToLower();
-
-        foreach (var whitelistEntry in whitelist)
-        {
-            var normalizedWhitelist = whitelistEntry.Trim().Replace(" ", "").ToLower();
-
-            if (normalizedWhitelist.Contains("/") &&
-                normalizedWhitelist.IndexOf('/') < normalizedWhitelist.Length - 1)
-            {
-                if (normalizedDetected == normalizedWhitelist)
-                    return true;
-            }
-            else
-            {
-                var whitelistDomain = GetDomain(normalizedWhitelist);
-                var detectedDomain = GetDomain(normalizedDetected);
-
-                if (detectedDomain == whitelistDomain)
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    public static string GetDomain(string url)
-    {
-        url = url.Replace("https://", "").Replace("http://", "").Replace("www.", "");
-
-        var slashIndex = url.IndexOf('/');
-        if (slashIndex >= 0)
-            url = url.Substring(0, slashIndex);
-
-        return url.TrimEnd('/');
-    }
-
-    
 }
