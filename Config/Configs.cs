@@ -1007,7 +1007,7 @@ namespace Game_Manager_GoldKingZ.Config
 
         [BreakLine("----------------------------[ ↓ Locally Config ↓ ]----------------------------{nextline}")]
 
-        [Comment("Save Players Data By Cookies Locally (In ../Game-Manager-GoldKingZ/cookies/)?")]
+        [Comment("Save Players Data By Cookies Locally (In ../plugins/Game-Manager-GoldKingZ/cookies/)?")]
         [Comment("0 = No")]
         [Comment("1 = Yes, But Save Data On Players Disconnect (Warning Performance)")]
         [Comment("2 = Yes, But Save Data On Map Change (Recommended)")]
