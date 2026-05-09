@@ -1,8 +1,17 @@
-## .:[ Join Our Discord For Support ]:.
+---
+<h2 align="center">.:[ Community | Support ]:.</h2>
+<p align="center">
+  <a href="https://discord.com/invite/U7AuQhu">
+    <img src="https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white" />
+  </a>
+  <a href="https://ko-fi.com/goldkingz">
+    <img src="https://img.shields.io/badge/Ko--fi-Support-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white" />
+  </a>
+</p>
 
-<a href="https://discord.com/invite/U7AuQhu"><img src="https://discord.com/api/guilds/651838917687115806/widget.png?style=banner2"></a>
+---
 
-# [CS2] Game-Manager-GoldKingZ (2.1.4)
+# [CS2] Game-Manager-GoldKingZ (2.1.5)
 
 Block/Hide Unnecessaries In Game
 
@@ -22,16 +31,9 @@ Block/Hide Unnecessaries In Game
 
 [![CounterStrikeSharp](https://img.shields.io/badge/CounterStrikeSharp-83358F)](https://github.com/roflmuffin/CounterStrikeSharp)
 
-
-[![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)](https://dev.mysql.com/doc/connector-net/en/) [Included in zip]
+[![ClientPrefs-GoldKingZ](https://img.shields.io/badge/ClientPrefs--GoldKingZ-FFD700?logo=github)](https://github.com/oqyh/cs2-ClientPrefs-GoldKingZ/releases) **[Required — Download `ClientPrefs-GoldKingZ.x.x.x.zip`]**
 
 [![JSON](https://img.shields.io/badge/JSON-000000?logo=json)](https://www.newtonsoft.com/json) [Included in zip]
-
-[![GeoLite2-City.mmdb](https://img.shields.io/badge/GeoLite2--City.mmdb-181717?logo=github&logoColor=white)](https://github.com/P3TERX/GeoLite.mmdb) [Included in zip]
-
-[![MaxMind.Db](https://img.shields.io/badge/MaxMind.Db-2A4365?logo=database&logoColor=white)](https://www.nuget.org/packages/MaxMind.Db) [Included in zip]
-
-[![MaxMind.GeoIP2](https://img.shields.io/badge/MaxMind.GeoIP2-2A4365?logo=database&logoColor=white)](https://www.nuget.org/packages/MaxMind.GeoIP2) [Included in zip]
 
 ---
 
@@ -46,28 +48,28 @@ Block/Hide Unnecessaries In Game
 ---
 
 ## ⚙️ Configuration
-
+ 
 > [!IMPORTANT]
 > **Main Configuration**  
 > `../Game-Manager-GoldKingZ/config/config.json`  
 > **Chat Configuration**  
-> `../Game-Manager-GoldKingZ/config/chat_processor.json`
-
-
+> `../Game-Manager-GoldKingZ/config/chat_processor.json`  
+> **Weapons Configuration**  
+> `../Game-Manager-GoldKingZ/config/weapons_config.json`
+ 
+ 
 ## 🛠️ `config/config.json`
-
+ 
 <details open>
 <summary><b>Main Config</b> (Click to expand 🔽)</summary>
   
 | Property                            | Description                               | Values                                                                                                                  | Required |
 | ----------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------- |
-| `AutoSetPlayerLanguage`             | Auto set player language based on country | `true`/`false`                                                                                                          | -        |
 | `Reload_GameManager_CommandsInGame` | Commands to reload plugin                 | `Console_Commands: css_reloadgamemanager, css_reloadgm`<br>`Chat_Commands:`                                             | -        |
 | `Reload_GameManager_Flags`          | Restricted flags for reload command       | `SteamIDs: 76561198206086993, STEAM_0:1:507335558`<br>`Flags: @css/root, @css/admin`<br>`Groups: #css/root, #css/admin` | `Reload_GameManager_CommandsInGame`        |
 | `Reload_GameManager_Hide`           | Hide chat after reload command            | `0`-No<br>`1`-Only after success<br>`2`-Always hide                                                                     | `Reload_GameManager_CommandsInGame`        |
 | `ExecuteOnEveryRoundEnd`            | Commands to execute every round end       | Example: `sv_alltalk true; sv_deadtalk true`<br>Empty = Disable                                                         | -        |
 | `ExecuteOnEveryRoundStart`          | Commands to execute every round start     | Example: `sv_alltalk false; sv_deadtalk false`<br>Empty = Disable                                                       | -        |
-
 
 </details>
 
@@ -83,6 +85,8 @@ Block/Hide Unnecessaries In Game
 | `BlockPing` | Block Players Ping | `true`/`false` | - |
 | `BlockSpray` | Block Players Graffiti Spray | `true`/`false` | - |
 | `BlockBots` | Block Bots (Permanently Remove bots) | `true`/`false` | - |
+| `BlockMapSaying` | Block when map sending messages | `0`-No<br>`1`-Yes, Completely<br>`2`-Yes, But Use `BlockMapSaying_Filter` | - |
+| `BlockMapSaying_Filter` | Per-map block rules (MapName + Block_Words) | Array of filter objects | `BlockMapSaying=2` |
 | `BlockNameChanger` | Block animated name changers | `0`-No<br>`1`-Send to spec with warning<br>`2`-Send to spec + execute command after delay | - |
 | `BlockNameChanger_Changes` | How many times each player is allowed to change their name | e.g. `3` | `BlockNameChanger = 1 or 2` |
 | `BlockNameChanger_Block` | Block duration (seconds) | e.g. `10` | `BlockNameChanger=1 or 2` |
@@ -92,17 +96,18 @@ Block/Hide Unnecessaries In Game
 | `Block_Commands_Contains` | Block commands containing | Array of strings | - |
 | `Block_Commands_Contains_IgnoreCase` | Ignore case for contains | `true`/`false` | - |
 | `Block_Commands_Ignore_Flags` | Ignore flags for command blocking | `SteamIDs: 76561198206086993, STEAM_0:1:507335558`<br>`Flags: @css/root, @css/admin`<br>`Groups: #css/root, #css/admin` | `Block_Commands_StartWith` or `Block_Commands_Contains` |
-
+ 
 </details>
 
 <details>
 <summary><b>Hide Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `HideRadar` | Hide Players Radar | `true`/`false` | - |
 | `HideKillfeed` | Hide Killfeed | `0`-No<br>`1`-Hide completely<br>`2`-Show only my kills | - |
-| `HideBloodAndHsSpark` | Hide Blood/Headshot Effects | `true`/`false` | - |
+| `HideHeadShotSpark` | Hide HeadShot Spark Effects | `true`/`false` | - |
+| `HideBloodDecals` | Hide Blood Decals | `true`/`false` | - |
 | `HideTeamMateHeadTag` | Hide Teammate Head Tags | `0`-No<br>`1`-Disable completely<br>`2`-Disable behind walls<br>`3`-Disable by distance | - |
 | `HideTeamMateHeadTag_Distance` | Head Tag Visibility Distance | `50`-Very close<br>`150`-Close<br>`250`-Far | `HideTeamMateHeadTag=3` |
 | `HideDeadBody` | Hide Dead Bodies | `0`-No<br>`1`-Immediately<br>`2`-After delay<br>`3`-Decay body | - |
@@ -111,12 +116,12 @@ Block/Hide Unnecessaries In Game
 | `HideChatHUD` | Hide Chat HUD | `0`-No<br>`1`-Yes<br>`2`-Yes with delay | - |
 | `HideChatHUD_Delay` | Chat Hide Delay (seconds) | e.g. `10` | `HideChatHUD=2` |
 | `HideWeaponsHUD` | Hide Weapons Icons | `true`/`false` | - |
-
+ 
 </details>
 
 <details>
 <summary><b>Disable Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `DisableChickenFromSpawn` | Disable Chickens From Spawning | `true`/`false` | - |
@@ -126,45 +131,46 @@ Block/Hide Unnecessaries In Game
 | `DisableSvCheats_1` | Force-disable sv_cheats | `true`/`false` | - |
 | `DisableC4` | Disable C4 In Game | `true`/`false` | - |
 | `DisableCameraSpectator` | Disable spectator camera transitions | `true`/`false` | - |
+| `DisableNewReloadClips` | Disable new reload clips behavior (if sv_infinite_ammo is not 2) | `0`-No<br>`1`-Yes<br>`2`-Yes, But Use Custom Ammo/Clip (`config/weapons_config.json`) | - |
 | `DisableAimPunch` | Disable screen shake when damaged | `0`-No<br>`1`-Yes<br>`2`-Togglable (enabled by default)<br>`3`-Togglable (disabled by default) | - |
 | `DisableAimPunch_CommandsInGame` | Toggle commands for aim punch | `Console_Commands: css_aim,css_aimpunch | Chat_Commands:` | `DisableAimPunch=2 or 3` |
 | `DisableAimPunch_Flags` | Restricted flags for aim punch toggle | `SteamIDs: 76561198206086993, STEAM_0:1:507335558`<br>`Flags: @css/root, @css/admin`<br>`Groups: #css/root, #css/admin` | `DisableAimPunch=2 or 3` |
 | `DisableAimPunch_Hide` | Hide chat after aim punch toggle | `0`-No<br>`1`-Only after success<br>`2`-Always hide | `DisableAimPunch=2 or 3` |
-
+ 
 </details>
 
 <details>
 <summary><b>Sounds Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `Sounds_MuteMVPMusic` | Mute MVP music | `0`-No<br>`1`-MVP music only<br>`2`-MVP + round end music | - |
 | `Sounds_MutePlayersFootSteps` | Mute footsteps | `true`/`false` | - |
 | `Sounds_MuteJumpLand` | Mute jump land sounds | `true`/`false` | - |
 | `Sounds_MuteKnife` | Mute knife stab sounds | `0`-No<br>`1`-Completely<br>`2`-Only on teammates | - |
-| `Sounds_MuteKnife_SoundeventHash` | Soundevent hashes for knife mute | Array of numbers | `Sounds_MuteKnife=1 or 2` |
+| `Sounds_MuteKnife_SoundeventHashAndString` | Soundevent hashes/names for knife mute | Array of strings | `Sounds_MuteKnife=1 or 2` |
 | `Sounds_MuteGunShots` | Mute gunshot sounds | `0`-No<br>`1`-Completely<br>`2`-Replace with M4 silencer<br>`3`-Replace with USP silencer<br>`4`-Custom replacement | - |
 | `Sounds_MuteGunShots_weapon_id` | Custom gun sound: weapon ID | Number (e.g. `0`) | `Sounds_MuteGunShots=4` |
 | `Sounds_MuteGunShots_sound_type` | Custom gun sound: type | Number (e.g. `9`) | `Sounds_MuteGunShots=4` |
 | `Sounds_MuteGunShots_item_def_index` | Custom gun sound: item index | Number (e.g. `61`) | `Sounds_MuteGunShots=4` |
 | `Custom_MuteSounds1` | Custom mute sounds 1 | `0`-No<br>`1`-Yes<br>`2`-Togglable (enabled)<br>`3`-Togglable (disabled) | - |
-| `Custom_MuteSounds1_SoundeventHash_Global_Side` | Global soundevent hashes | Array of numbers | `Custom_MuteSounds1=1` |
-| `Custom_MuteSounds1_SoundeventHash_Victim_Side` | Victim-side soundevent hashes | Array of numbers | `Custom_MuteSounds1=2 or 3` |
-| `Custom_MuteSounds1_SoundeventHash_Attacker_Side` | Attacker-side soundevent hashes | Array of numbers | `Custom_MuteSounds1=2 or 3` |
+| `Custom_MuteSounds1_SoundeventHashAndString_Global_Side` | Global soundevent hashes/names | Array of strings | `Custom_MuteSounds1=1` |
+| `Custom_MuteSounds1_SoundeventHashAndString_Victim_Side` | Victim-side soundevent hashes/names | Array of strings | `Custom_MuteSounds1=2 or 3` |
+| `Custom_MuteSounds1_SoundeventHashAndString_Attacker_Side` | Attacker-side soundevent hashes/names | Array of strings | `Custom_MuteSounds1=2 or 3` |
 | `Custom_MuteSounds1_CommandsInGame` | Toggle commands | `Console_Commands: | Chat_Commands:` | `Custom_MuteSounds1=2 or 3` |
 | `Custom_MuteSounds1_Flags` | Restricted flags | `SteamIDs: 76561198206086993, STEAM_0:1:507335558`<br>`Flags: @css/root, @css/admin`<br>`Groups: #css/root, #css/admin` | `Custom_MuteSounds1=2 or 3` |
 | `Custom_MuteSounds1_Hide` | Hide chat after toggle | `0`-No<br>`1`-Only after success<br>`2`-Always hide | `Custom_MuteSounds1=2 or 3` |
 | `Custom_MuteSounds2` | Custom mute sounds 2 | `0`-No<br>`1`-Yes<br>`2`-Togglable (enabled)<br>`3`-Togglable (disabled) | - |
 | `Custom_MuteSounds3` | Custom mute sounds 3 | `0`-No<br>`1`-Yes<br>`2`-Togglable (enabled)<br>`3`-Togglable (disabled) | - |
-
+ 
 </details>
 
 <details>
 <summary><b>Default Messages Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
-| `Ignore_BombPlantedHUDMessages` | Ignore bomb planted HUD messages/sound | `true`/`false` | - |
+| `Ignore_BombPlantedHUDMessagesAndSound` | Ignore bomb planted HUD messages and sound | `true`/`false` | - |
 | `Ignore_TeamMateAttackMessages` | Ignore teammate attack messages | `true`/`false` | - |
 | `Ignore_AwardsMoneyMessages` | Ignore money award messages | `true`/`false` | - |
 | `Ignore_PlayerSavedYouByPlayerMessages` | Ignore "saved you" messages | `true`/`false` | - |
@@ -176,12 +182,11 @@ Block/Hide Unnecessaries In Game
 | `Ignore_Custom_TextMsg` | Ignore custom TextMsg messages | Array of strings | - |
 | `Ignore_Custom_HintText` | Ignore custom HintText messages | Array of strings | - |
 | `Ignore_Custom_RadioText` | Ignore custom RadioText messages | Array of strings | - |
-
+ 
 </details>
-
 <details>
 <summary><b>Custom Messages Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `Custom_ChatMessages` | Enable custom chat messages (via `chat_processor.json`) | `true`/`false` | - |
@@ -192,19 +197,19 @@ Block/Hide Unnecessaries In Game
 | `Custom_ChatMessages_ExcludeStartWith_IgnoreCase` | Ignore case for start-with | `true`/`false` | `Custom_ChatMessages=true` |
 | `Custom_ChatMessages_ExcludeContains` | Exclude chat messages containing text | Array of strings | `Custom_ChatMessages=true` |
 | `Custom_ChatMessages_ExcludeContains_IgnoreCase` | Ignore case for contains | `true`/`false` | `Custom_ChatMessages=true` |
-
+ 
 </details>
 
 <details>
 <summary><b>Auto Clean Drop Weapons Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `AutoClean_Enable` | Enable auto clean dropped weapons | `true`/`false` | - |
 | `AutoClean_Timer` | Check interval (seconds) | `1`-`999` | `AutoClean_Enable=true` |
 | `AutoClean_MaxWeaponsOnGround` | Start cleaning when X weapons on ground | `1`-`999` | `AutoClean_Enable=true` |
 | `AutoClean_TheseDroppedWeaponsOnly` | Weapons to auto clean | `A`-Snipers<br>`B`-Rifles<br>`C`-LMGs<br>`D`-Shotguns<br>`E`-SMGs<br>`F`-Pistols<br>`G`-Grenades<br>`H`-Defuse kits<br>`I`-Taser<br>`J`-Healthshot<br>`K`-Knives<br>`ANY`-All weapons<br>Or specific weapon names | `AutoClean_Enable=true` |
-
+ 
 **Weapon Categories Key:**
 - `A`: AWP, G3SG1, SCAR-20, SSG 08
 - `B`: AK-47, AUG, FAMAS, Galil, M4 variants
@@ -217,34 +222,33 @@ Block/Hide Unnecessaries In Game
 - `I`: Zeus
 - `J`: Healthshot
 - `K`: Knives
-
 </details>
 
 <details>
 <summary><b>Advanced Filters Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `Filter_Whitelist_Ips` | Whitelist IP addresses | Array of IPs | - |
 | `Filter_Whitelist_URLs` | Whitelist URLs | Array of URLs | - |
 | `Filter_Players_Names` | Filter player names | `0`-No<br>`1`-Check IPs<br>`2`-Check URLs<br>`3`-Check both | - |
 | `Filter_Players_Chat` | Filter player chat | `0`-No<br>`1`-Check IPs<br>`2`-Check URLs<br>`3`-Check both | - |
-
+ 
 </details>
 
 <details>
 <summary><b>Locally Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `Cookies_Enable` | Save player data locally | `0`-No<br>`1`-On disconnect<br>`2`-On map change | - |
-| `Cookies_AutoRemovePlayerOlderThanXDays` | Auto delete inactive players (days) | `0`-Don't delete<br>`1`+ days | `Cookies_Enable=1 or 2` |
-
+| `Cookies_AutoRemoveInactivePlayersOlderThanDays` | Auto delete inactive players (days) | `0`-Don't delete<br>`1`+ days | `Cookies_Enable=1 or 2` |
+ 
 </details>
 
 <details>
 <summary><b>MySql Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
 | `MySql_Enable` | Save player data to MySQL | `0`-No<br>`1`-On disconnect<br>`2`-On map change | - |
@@ -252,26 +256,59 @@ Block/Hide Unnecessaries In Game
 | `MySql_RetryAttempts` | Retry attempts on failure | e.g. `3` | `MySql_Enable=1 or 2` |
 | `MySql_RetryDelay` | Delay between retries (seconds) | e.g. `2` | `MySql_Enable=1 or 2` |
 | `MySql_Servers` | MySQL server configurations | Array of server objects | `MySql_Enable=1 or 2` |
-| `MySql_AutoRemovePlayerOlderThanXDays` | Auto delete inactive players (days) | `0`-Don't delete<br>`1`+ days | `MySql_Enable=1 or 2` |
-
+| `MySql_AutoRemoveInactivePlayersOlderThanDays` | Auto delete inactive players (days) | `0`-Don't delete<br>`1`+ days | `MySql_Enable=1 or 2` |
+ 
 </details>
 
 <details>
 <summary><b>Utilities Config</b> (Click to expand 🔽)</summary>
-
+  
 | Property | Description | Values | Required |  
 |----------|-------------|--------|----------|
-| `AutoUpdateGeoLocation` | Auto update GeoLocation data | `true`/`false` | - |
+| `AutoUpdateSignatures` | Auto update signatures (gamedata.json) | `true`/`false` | - |
+| `UseOnConVarChangedHook` | Use OnConVarChanged hook on any ConVar change made by Game Manager | `true`/`false` | - |
 | `EnableDebug` | Enable Debug Mode | `0`-No<br>`1`-Debug everything<br>`2`-Custom_MuteSounds only<br>`3`-Sounds_MuteGunShots only<br>`4`-Ignore_Custom messages only | - |
+ 
+</details>
 
+## 🛠️ `config/weapons_config.json`
+ 
+<details open>
+<summary><b>Weapons Config</b> (Click to expand 🔽)</summary>
+  
+**Configuration Properties:**
+ 
+| Property | Description | Values |
+|----------|-------------|--------|
+| `Clip` | Magazine Size | Number (e.g. `30`) / Not Used = Default Weapon Magazine |
+| `Ammo` | Reserve Ammo | Number (e.g. `90`) / Not Used = New Reload Clips Behavior |
+| `UnlimitedClip` | Magazine never runs out (player never reloads) | `true` = Yes / `false` or Not Used = No |
+| `UnlimitedAmmo` | Reserve ammo never decreases (player still reloads normally) | `true` = Yes / `false` or Not Used = No |
+| `UseOldReload` | Use old reload behavior (bullets left in clip are wasted) | `true` = Yes / `false` or Not Used = No |
+ 
+**Weapon Names:**
+ 
+| Category | Weapons |
+|----------|---------|
+| Snipers | `weapon_awp`, `weapon_g3sg1`, `weapon_scar20`, `weapon_ssg08` |
+| Rifles | `weapon_ak47`, `weapon_aug`, `weapon_famas`, `weapon_galilar`, `weapon_m4a1_silencer`, `weapon_m4a1`, `weapon_sg556` |
+| Machine Guns | `weapon_m249`, `weapon_negev` |
+| Shotguns | `weapon_mag7`, `weapon_nova`, `weapon_sawedoff`, `weapon_xm1014` |
+| SMGs | `weapon_bizon`, `weapon_mac10`, `weapon_mp5sd`, `weapon_mp7`, `weapon_mp9`, `weapon_p90`, `weapon_ump45` |
+| Pistols | `weapon_cz75a`, `weapon_deagle`, `weapon_elite`, `weapon_fiveseven`, `weapon_glock`, `weapon_hkp2000`, `weapon_p250`, `weapon_revolver`, `weapon_tec9`, `weapon_usp_silencer` |
+ 
+> **Note:** The new reload clips behavior will only apply to weapons not listed in this config.
+ 
 </details>
 
 ## 🛠️ `config/chat_processor.json`
-
+ 
 <details open>
+  
 <summary><b>Chat Processor Config</b> (Click to expand 🔽)</summary>
 
-## Configuration Placeholders
+**Configuration Placeholders:**
+ 
 | Placeholder | Description |
 |-------------|-------------|
 | `{ClanTag_ScoreBoard}` | Clan Tag At ScoreBoard |
@@ -296,8 +333,9 @@ Block/Hide Unnecessaries In Game
 | `{Nade_Incgrenade}` | Incendiary Grenade Throw Message |
 | `{Nade_Flashbang}` | Flashbang Throw Message |
 | `{Nade_Decoy}` | Decoy Grenade Throw Message |
-
-## Message Placeholders
+ 
+**Message Placeholders:**
+ 
 | Placeholder | Description |
 |-------------|-------------|
 | `{PLAYER_NAME}` | Player Name |
@@ -306,8 +344,9 @@ Block/Hide Unnecessaries In Game
 | `{ClanTag_Chat}` | Clan Tag At Chat |
 | `{PLAYER_LOCATION}` | Player Location |
 | `{PLAYER_MSG}` | Player Message |
-
-## Available Colors
+ 
+**Available Colors:**
+ 
 | Color | Code | Color | Code |
 |-------|------|-------|------|
 | Default | `{Default}` | White | `{White}` |
@@ -321,13 +360,13 @@ Block/Hide Unnecessaries In Game
 | DarkBlue | `{DarkBlue}` | BlueGrey | `{BlueGrey}` |
 | Magenta | `{Magenta}` | LightRed | `{LightRed}` |
 | Orange | `{Orange}` | Team Color | `{team_color}` |
-
+ 
 **Special Color Notes:**
 - `{team_color}` = Dynamically changes color based on team:
   - Spectator = LightPurple
   - Terrorist = Orange  
   - Counter-Terrorist = LightBlue
-
+  
 </details>
 
 ---
@@ -337,6 +376,35 @@ Block/Hide Unnecessaries In Game
 
 <details>
 <summary><b>📋 View Version History</b> (Click to expand 🔽)</summary>
+
+### [2.1.5]
+- Clean Up
+- Fix Bug HideChatHUD
+- Fix Bug AutoClean_MaxWeaponsOnGround Now Count Exactly Not AutoClean_MaxWeaponsOnGround -1
+- Fix Bug AutoClean_TheseDroppedWeaponsOnly weapon_m4a1_silencer And weapon_usp_silencer
+- Fix Disable_AimPunch
+- Fix Duplicate Reload On Reload_GameManager_CommandsInGame
+- Fix Error 'PlayerConnectedState' does not contain a definition for 'PlayerConnected'
+- Fix Error 'PlayerConnectedState' does not contain a definition for 'Disconnecting'
+- Fix Bug On HideDeadBody When Player Invisible Dead And Reload Plugin
+- Fix Filter_Players_Names Renaming Players To "Player" When Their Name Is Empty
+- Removed AutoSetPlayerLanguage 
+- Removed AutoUpdateGeoLocation
+- Removed HideBloodAndHsSpark
+- Removed Dependencies [MaxMind.Db.dll]
+- Removed Dependencies [MaxMind.GeoIP2.dll]
+- Removed Dependencies [MySqlConnector.dll]
+- Added Dependencies ClientPrefs-GoldKingZ Api To Plugin
+- Added BlockMapSaying
+- Added BlockMapSaying_Filter
+- Added DisableNewReloadClips
+- Added AutoUpdateSignatures
+- Added UseOnConVarChangedHook
+- Added HideHeadShotSpark
+- Added HideBloodDecals
+- Rename Ignore_BombPlantedHUDMessages To Ignore_BombPlantedHUDMessagesAndSound
+- Rename Cookies_AutoRemovePlayerOlderThanXDays To Cookies_AutoRemoveInactivePlayersOlderThanDays
+- Rename MySql_AutoRemovePlayerOlderThanXDays To MySql_AutoRemoveInactivePlayersOlderThanDays
 
 ### [2.1.4]
 - Updated Plugin With v1.0.361 CounterStrikeSharp Api
