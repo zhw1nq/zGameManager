@@ -1440,7 +1440,7 @@ public class Helper
 
             assign(parsed);
 
-            var formattedJson = parsed.ToString(Formatting.Indented);
+            var formattedJson = JsonConvert.SerializeObject(parsed, Formatting.Indented);
             var commentLines = allLines.Where(l => l.TrimStart().StartsWith("//")).ToList();
 
             if (commentLines.Count > 0) commentLines.Add("");
