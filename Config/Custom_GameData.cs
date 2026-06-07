@@ -4,9 +4,9 @@ using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using CounterStrikeSharp.API.Core;
 using Newtonsoft.Json.Linq;
-using Game_Manager_GoldKingZ.Config;
+using zGameManager.Config;
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public class CustomGameData
 {

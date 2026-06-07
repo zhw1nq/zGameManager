@@ -23,11 +23,11 @@ using System.Drawing;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using CounterStrikeSharp.API.Modules.Entities.Constants;
 using CounterStrikeSharp.API.Modules.Menu;
-using Game_Manager_GoldKingZ;
+using zGameManager;
 using System.Reflection.Metadata;
-using Game_Manager_GoldKingZ.Config;
+using zGameManager.Config;
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public class Game_Listeners
 {

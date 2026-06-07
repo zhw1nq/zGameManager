@@ -1,7 +1,7 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using System.Text;
-using Game_Manager_GoldKingZ.Config;
+using zGameManager.Config;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Core.Translations;
@@ -9,7 +9,7 @@ using Microsoft.VisualBasic;
 using System.Text.RegularExpressions;
 using CounterStrikeSharp.API.Modules.UserMessages;
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public class Game_UserMessages
 {

@@ -1,4 +1,4 @@
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public class JsonCreator
 {

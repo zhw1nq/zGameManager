@@ -10,11 +10,11 @@ using System.Globalization;
 using Newtonsoft.Json.Converters;
 using System.Drawing;
 using CounterStrikeSharp.API.Modules.UserMessages;
-using Game_Manager_GoldKingZ.Config;
+using zGameManager.Config;
 using System.Security.Cryptography;
 using CounterStrikeSharp.API.Modules.Cvars;
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 public static class Extension
 {
     public static bool IsValid([NotNullWhen(true)] this CCSPlayerController? player, bool IncludeBots = false, bool IncludeHLTV = false)

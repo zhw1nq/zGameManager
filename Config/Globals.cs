@@ -1,7 +1,7 @@
 using CounterStrikeSharp.API.Core;
 using Newtonsoft.Json.Linq;
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public class Globals_Static
 {

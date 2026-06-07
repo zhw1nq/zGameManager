@@ -10,14 +10,14 @@ using CounterStrikeSharp.API.Modules.Timers;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Entities;
-using Game_Manager_GoldKingZ.Config;
+using zGameManager.Config;
 using CounterStrikeSharp.API.Modules.Memory;
 using System.Drawing;
 using System.Security.Cryptography;
 using System.Globalization;
 
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public class Helper
 {
@@ -1924,7 +1924,7 @@ public class Helper
             }
 
             _httpClient_Github.DefaultRequestHeaders.Remove("User-Agent");
-            _httpClient_Github.DefaultRequestHeaders.Add("User-Agent", "CS2-Game-Manager");
+            _httpClient_Github.DefaultRequestHeaders.Add("User-Agent", "zGameManager");
 
             string actualDownloadUrl = githubUrl;
 

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public static class Con
 {

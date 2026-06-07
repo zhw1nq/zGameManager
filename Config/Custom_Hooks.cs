@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Game_Manager_GoldKingZ.Config;
+using zGameManager.Config;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Memory.DynamicFunctions;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -8,7 +8,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Modules.Memory;
 using CounterStrikeSharp.API.Modules.Cvars;
 
-namespace Game_Manager_GoldKingZ;
+namespace zGameManager;
 
 public static class CustomHooks
 {

@@ -1,0 +1,29 @@
+{
+	"PrintToChatToPlayer.ReloadPlugin.Not.Allowed": "{gold}7Mau {silver}» {darkred}Bạn không có quyền",
+	"PrintToChatToPlayer.ReloadPlugin.Successfully": "{gold}7Mau {silver}» {grey}Tải lại Plugin {lime}thành công",
+	"PrintToChatToPlayer.Toggle.AntiAimPunch.Not.Allowed": "{gold}7Mau {silver}» {darkred}Bạn không có quyền",
+	"PrintToChatToPlayer.Toggle.AntiAimPunch.Enabled": "{gold}7Mau {silver}» {grey}Chống rung màn hình khi trúng đạn hiện đã được {lime}Kích hoạt",
+	"PrintToChatToPlayer.Toggle.AntiAimPunch.Disabled": "{gold}7Mau {silver}» {grey}Chống rung màn hình khi trúng đạn hiện đã bị {darkred}Vô hiệu hóa",
+	"PrintToChatToPlayer.Toggle.MuteSounds_1.Not.Allowed": "{gold}7Mau {silver}» {darkred}Bạn không có quyền",
+	"PrintToChatToPlayer.Toggle.MuteSounds_1.Enabled": "{gold}7Mau {silver}» {grey}Tắt âm thanh HeadShot hiện đã được {lime}Kích hoạt",
+	"PrintToChatToPlayer.Toggle.MuteSounds_1.Disabled": "{gold}7Mau {silver}» {grey}Tắt âm thanh HeadShot hiện đã bị {darkred}Vô hiệu hóa",
+	"PrintToChatToPlayer.Toggle.MuteSounds_2.Not.Allowed": "{gold}7Mau {silver}» {darkred}Bạn không có quyền",
+	"PrintToChatToPlayer.Toggle.MuteSounds_2.Enabled": "{gold}7Mau {silver}» {grey}Tắt âm thanh BodyShot hiện đã được {lime}Kích hoạt",
+	"PrintToChatToPlayer.Toggle.MuteSounds_2.Disabled": "{gold}7Mau {silver}» {grey}Tắt âm thanh BodyShot hiện đã bị {darkred}Vô hiệu hóa",
+	"PrintToChatToPlayer.Toggle.MuteSounds_3.Not.Allowed": "{gold}7Mau {silver}» {darkred}Bạn không có quyền",
+	"PrintToChatToPlayer.Toggle.MuteSounds_3.Enabled": "{gold}7Mau {silver}» {grey}Tính năng phụ hiện đã được {lime}Kích hoạt",
+	"PrintToChatToPlayer.Toggle.MuteSounds_3.Disabled": "{gold}7Mau {silver}» {grey}Tính năng phụ hiện đã bị {darkred}Vô hiệu hóa",
+	"PrintToChatToPlayer.BlockCommands": "{gold}7Mau {silver}» {darkred}Lệnh {green}[{0}] đã bị chặn bởi máy chủ",
+	
+	"PrintToChatToPlayer.Filter.IPs": "{gold}7Mau {silver}» {grey}Không cho phép chia sẻ địa chỉ IP trong chat",
+	"PrintToChatToPlayer.Filter.URLs": "{gold}7Mau {silver}» {grey}Không cho phép chia sẻ liên kết trang web trong chat",
+
+	"PrintToChatToPlayer.HideChat.Warning": "{darkred}-------------------------------------------------------{nextline}{gold}7Mau {silver}» {darkred}Khung chat HUD sẽ bị ẩn sau {lime}{0} giây {nextline}{gold}7Mau {silver}» {darkred}Vui lòng mở {lime}Hộp thoại Chat (Y/U) {darkred}trên bàn phím để xem chat tạm thời{nextline}{darkred}-------------------------------------------------------",
+
+	"PrintToChatToPlayer.NameChanging.Warning": "{gold}7Mau {silver}» {grey}Không cho phép đổi tên trên máy chủ này {nextline}{gold}7Mau {silver}» {grey}Bạn đã bị chuyển sang đội Quan sát (Spectator)",
+	"PrintToChatToPlayer.NameChanging.Mode1.Blocked": "{gold}7Mau {silver}» {grey}Bạn đã bị chặn tham gia vào đội{nextline}{gold}7Mau {silver}» {grey}Hãy dừng đổi tên và chờ {lime}{0} giây",
+	"PrintToCenterToPlayer.NameChanging.Mode1.Blocked": "<font class='fontSize-m' color='#ff5555'>Không cho phép đổi tên!</font> <br> <font class='fontSize-m'>Bạn sẽ được bỏ chặn sau</font> <br> <font class='fontSize-m' color='#7CFC00'> {0} giây</font> <br> <font color='#fa00e4'>Nếu bạn tiếp tục đổi tên, thời gian chờ sẽ đặt lại</font></font>",
+	"PrintToChatToPlayer.NameChanging.Mode1.UnBlocked": "{gold}7Mau {silver}» {grey}Bạn đã được {lime}Mở chặn! {grey}Bây giờ bạn có thể tham gia vào đội",
+	"PrintToChatToPlayer.NameChanging.Mode2.Blocked": "{gold}7Mau {silver}» {grey}Bạn đã bị chặn tham gia vào đội{nextline}{gold}7Mau {silver}» {grey}Bạn sẽ bị KICK sau {lime}{0} giây",
+	"PrintToCenterToPlayer.NameChanging.Mode2.Blocked": "<font class='fontSize-l' color='#ff5555'>Không cho phép đổi tên!</font> <br><br> <font class='fontSize-m'>Bạn sẽ bị KICK sau</font> <br> <font class='fontSize-m' color='#7CFC00'>{0} giây</font> <br>"
+}
